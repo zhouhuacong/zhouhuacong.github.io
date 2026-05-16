@@ -17,6 +17,12 @@
             line-height: 1.8;
             overflow-x: hidden;
         }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none;
+            background: url('assets/54jcIqM.png') center center / cover no-repeat fixed;
+            opacity: 0.12;
+        }
         a { color: #f0c040; text-decoration: none; transition: 0.3s; }
         a:hover { color: #ffd700; text-shadow: 0 0 12px rgba(240,192,64,0.4); }
 
@@ -49,7 +55,19 @@
         .hero::before {
             content: '';
             position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 50% 30%, rgba(240,192,64,0.08) 0%, transparent 60%);
+            background:
+                linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0.7) 100%),
+                radial-gradient(ellipse at 50% 30%, rgba(240,192,64,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero-bg {
+            position: absolute; inset: 0; z-index: -1;
+            background: url('assets/54jcIqM.png') center center / cover no-repeat;
+            filter: brightness(0.6) saturate(1.2);
+        }
+        .hero-scroll-fade {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 30vh;
+            background: linear-gradient(to top, #0a0a0f 0%, transparent 100%);
             pointer-events: none;
         }
         .hero-triforce {
@@ -297,11 +315,16 @@
 </head>
 <body>
 
+<!-- ===== FIXED BACKGROUND ===== -->
+<div class="bg-overlay"></div>
+
 <!-- ===== PARTICLES ===== -->
 <canvas id="particles-canvas"></canvas>
 
 <!-- ===== HERO ===== -->
 <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-scroll-fade"></div>
     <div class="hero-triforce">△</div>
     <h1>
         海拉鲁编年史
