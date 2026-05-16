@@ -1,7 +1,697 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海拉鲁编年史 — 塞尔达传说</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: #0a0a0f;
+            color: #e8dcc8;
+            font-family: 'Noto Serif SC', 'Inter', serif;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        a { color: #f0c040; text-decoration: none; transition: 0.3s; }
+        a:hover { color: #ffd700; text-shadow: 0 0 12px rgba(240,192,64,0.4); }
+
+        /* ===== UTILITIES ===== */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .gold { color: #f0c040; }
+        .green { color: #4ade80; }
+        .blue { color: #60a5fa; }
+        .purple { color: #a78bfa; }
+        .red { color: #f87171; }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #f0c040; border-radius: 4px; }
+
+        /* ===== PARTICLES BG ===== */
+        #particles-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; opacity: 0.4;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative; z-index: 1;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 40px 20px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 30%, rgba(240,192,64,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero-triforce {
+            font-size: 80px; line-height: 1; margin-bottom: 20px;
+            filter: drop-shadow(0 0 30px rgba(240,192,64,0.3));
+            animation: triforce-glow 3s ease-in-out infinite;
+        }
+        @keyframes triforce-glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(240,192,64,0.3)); }
+            50% { filter: drop-shadow(0 0 40px rgba(240,192,64,0.6)); }
+        }
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            color: #f0c040;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 40px rgba(240,192,64,0.3);
+        }
+        .hero h1 span { display: block; font-size: 0.35em; letter-spacing: 0.3em; color: #e8dcc8; font-weight: 400; margin-top: 8px; opacity: 0.7; }
+        .hero p {
+            margin-top: 20px; font-size: 1.1rem; opacity: 0.7;
+            max-width: 600px;
+        }
+        .scroll-indicator {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: #f0c040; font-size: 12px; letter-spacing: 0.2em; opacity: 0.5;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        .scroll-indicator .arrow { font-size: 24px; }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ===== SECTION COMMON ===== */
+        section { position: relative; z-index: 1; padding: 100px 0; }
+        section:nth-child(odd) { background: rgba(240,192,64,0.02); }
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 0.05em;
+        }
+        .section-title::after {
+            content: '◈';
+            display: block; margin-top: 12px;
+            font-size: 20px; opacity: 0.4;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline { position: relative; padding-left: 40px; }
+        .timeline::before {
+            content: '';
+            position: absolute; left: 14px; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #f0c040, #4ade80, #60a5fa, #a78bfa, #f0c040);
+        }
+        .timeline-item {
+            position: relative; margin-bottom: 48px; padding-left: 30px;
+        }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-dot {
+            position: absolute; left: -34px; top: 6px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #f0c040; border: 3px solid #0a0a0f;
+            box-shadow: 0 0 12px rgba(240,192,64,0.4);
+        }
+        .timeline-item.defeated .timeline-dot { background: #f87171; box-shadow: 0 0 12px rgba(248,113,113,0.4); }
+        .timeline-item.child .timeline-dot { background: #4ade80; box-shadow: 0 0 12px rgba(74,222,128,0.4); }
+        .timeline-item.adult .timeline-dot { background: #60a5fa; box-shadow: 0 0 12px rgba(96,165,250,0.4); }
+        .timeline-item.wild .timeline-dot { background: #a78bfa; box-shadow: 0 0 12px rgba(167,139,250,0.4); }
+        .timeline-era {
+            display: inline-block;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            padding: 3px 12px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+        }
+        .timeline-era.era-defeated { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+        .timeline-era.era-child { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+        .timeline-era.era-adult { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+        .timeline-era.era-wild { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+        .timeline-era.era-unified { background: rgba(240,192,64,0.15); color: #f0c040; border: 1px solid rgba(240,192,64,0.3); }
+        .timeline-item h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            margin-bottom: 4px;
+        }
+        .timeline-item .sub {
+            font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px;
+        }
+        .timeline-item p {
+            font-size: 0.92rem; opacity: 0.8; line-height: 1.7;
+        }
+
+        /* ===== BRANCH VISUAL ===== */
+        .branch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        .branch-card {
+            padding: 28px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            transition: 0.3s;
+        }
+        .branch-card:hover { transform: translateY(-4px); }
+        .branch-card.defeated { background: rgba(248,113,113,0.06); border-color: rgba(248,113,113,0.2); }
+        .branch-card.child { background: rgba(74,222,128,0.06); border-color: rgba(74,222,128,0.2); }
+        .branch-card.adult { background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.2); }
+        .branch-card.wild { background: rgba(167,139,250,0.06); border-color: rgba(167,139,250,0.2); }
+        .branch-card h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+        .branch-card p {
+            font-size: 0.85rem; opacity: 0.6; line-height: 1.6;
+        }
+
+        /* ===== CHARACTER CARDS ===== */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .char-card {
+            padding: 24px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            transition: 0.3s;
+            text-align: center;
+        }
+        .char-card:hover {
+            border-color: rgba(240,192,64,0.3);
+            box-shadow: 0 0 30px rgba(240,192,64,0.05);
+        }
+        .char-icon {
+            font-size: 36px; margin-bottom: 12px;
+        }
+        .char-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .char-card .role {
+            font-size: 0.75rem; opacity: 0.5; margin-bottom: 8px;
+        }
+        .char-card p {
+            font-size: 0.82rem; opacity: 0.65; line-height: 1.6;
+        }
+
+        /* ===== EVENTS ===== */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .event-card {
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            transition: 0.3s;
+        }
+        .event-card:hover {
+            border-color: rgba(240,192,64,0.3);
+            transform: translateY(-2px);
+        }
+        .event-card .year {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: #f0c040;
+            margin-bottom: 4px;
+        }
+        .event-card h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .event-card p {
+            font-size: 0.85rem; opacity: 0.65; line-height: 1.6;
+        }
+
+        /* ===== TRIFORCE PHILOSOPHY ===== */
+        .philosophy {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+        .phil-card {
+            padding: 36px 20px;
+            border-radius: 12px;
+        }
+        .phil-card.courage { background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.15); }
+        .phil-card.wisdom { background: rgba(96,165,250,0.05); border: 1px solid rgba(96,165,250,0.15); }
+        .phil-card.power { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.15); }
+        .phil-card .symbol { font-size: 40px; margin-bottom: 12px; }
+        .phil-card h4 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin-bottom: 8px; }
+        .phil-card p { font-size: 0.85rem; opacity: 0.6; line-height: 1.6; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: relative; z-index: 1;
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid rgba(240,192,64,0.1);
+        }
+        footer .triforce {
+            font-size: 40px; margin-bottom: 16px;
+            filter: drop-shadow(0 0 20px rgba(240,192,64,0.2));
+        }
+        footer p { font-size: 0.8rem; opacity: 0.4; }
+        footer .hearts {
+            margin-top: 12px;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            section { padding: 60px 0; }
+            .timeline { padding-left: 30px; }
+            .timeline-dot { left: -26px; width: 10px; height: 10px; }
+            .char-grid { grid-template-columns: repeat(2, 1fr); }
+            .branch-container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .char-grid { grid-template-columns: 1fr; }
+            .philosophy { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+
+<!-- ===== PARTICLES ===== -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-triforce">△</div>
+    <h1>
+        海拉鲁编年史
+        <span>The Legend of Zelda</span>
+    </h1>
+    <p>勇气之剑划过时空，三角力量连结万物。<br>一段跨越万年、横贯三界的史诗。</p>
+    <div class="scroll-indicator">
+        <span>向下探索</span>
+        <span class="arrow">▼</span>
+    </div>
+</section>
+
+<!-- ===== 世界观 ===== -->
+<section id="worldview">
+    <div class="container">
+        <h2 class="section-title">世界观 · 三角力量</h2>
+        <p style="text-align:center; max-width:700px; margin: -30px auto 40px; opacity:0.6; font-size:0.92rem;">
+            三位黄金女神降临混沌，创造天地万物。离去之时，留下蕴含其力量的黄金三角——
+            <span class="gold">三角力量</span>，它能实现触碰者内心的愿望。
+            力量、智慧、勇气，三者合一即为神。
+        </p>
+        <div class="philosophy">
+            <div class="phil-card courage">
+                <div class="symbol">💚</div>
+                <h4 class="green">勇气 — 林克</h4>
+                <p>不畏惧任何黑暗的勇者之魂。三角力量的勇气碎片，守护着海拉鲁的和平。</p>
+            </div>
+            <div class="phil-card wisdom">
+                <div class="symbol">💙</div>
+                <h4 class="blue">智慧 — 塞尔达</h4>
+                <p>继承女神海利亚之血的海拉鲁公主。智慧、封印之力与时间之力，在血脉中流淌。</p>
+            </div>
+            <div class="phil-card power">
+                <div class="symbol">❤️</div>
+                <h4 class="red">力量 — 加农多夫</h4>
+                <p>渴望支配世界的野心。蛮族之王、魔王、灾厄盖侬——力量三角的永恒追逐者。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 人物关系 ===== -->
+<section id="characters">
+    <div class="container">
+        <h2 class="section-title">主要人物</h2>
+        <div class="char-grid">
+            <div class="char-card">
+                <div class="char-icon green">⚔️</div>
+                <h3 class="green">林克</h3>
+                <div class="role">勇者 · 大师之剑持有者</div>
+                <p>沉默寡言的剑士，女神海利亚选定之人。每一世轮回中，他都会拿起大师之剑，为海拉鲁而战。名字意为"连接"——连接人与神、过去与未来。</p>
+            </div>
+            <div class="char-card">
+                <div class="char-icon blue">👑</div>
+                <h3 class="blue">塞尔达</h3>
+                <div class="role">海拉鲁公主 · 女神转世</div>
+                <p>女神海利亚的转世。拥有封印之力和时间之力。智慧、坚毅、勇敢——她是海拉鲁真正的守护者，无数次独自承受千年的等待与抗争。</p>
+            </div>
+            <div class="char-card">
+                <div class="char-icon red">🐗</div>
+                <h3 class="red">加农多夫</h3>
+                <div class="role">魔王 · 灾厄化身</div>
+                <p>格鲁德族的唯一男性，被力量三角选中。野心如熔岩般炽热，一次次试图用力量统治世界。他的存在是海拉鲁永恒的对立面——"光的影子"。</p>
+            </div>
+            <div class="char-card">
+                <div class="char-icon gold">🦉</div>
+                <h3 class="gold">英帕</h3>
+                <div class="role">希卡族长老 · 守护者</div>
+                <p>希卡族的领袖，世代效忠海拉鲁王室。智慧超群，是塞尔达公主的导师与战友。在旷野之息中，以百岁老人之姿指引林克找回记忆。</p>
+            </div>
+            <div class="char-card">
+                <div class="char-icon gold">🗡️</div>
+                <h3 class="gold">大师之剑</h3>
+                <div class="role">退魔之剑 · 众神的封印</div>
+                <p>又称"退魔之剑"，唯一能封印加农的武器。沉睡于时之神殿的森林深处，只有被女神选中的勇者才能将其拔出。当勇者需要时，剑会发出光芒。</p>
+            </div>
+            <div class="char-card">
+                <div class="char-icon gold">✨</div>
+                <h3 class="gold">四英杰</h3>
+                <div class="role">神兽的操者们</div>
+                <p><span class="blue">米法</span>（卓拉族）、<span class="red">达尔克尔</span>（鼓隆族）、<span class="green">力巴尔</span>（利特族）、<span class="purple">乌尔波扎</span>（格鲁德族）。各自操控神兽，百年前与灾厄盖侬一战全部牺牲。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 时间线 ===== -->
+<section id="timeline">
+    <div class="container">
+        <h2 class="section-title">时间线 · 时空的分歧</h2>
+        <p style="text-align:center; max-width:650px; margin: -30px auto 40px; opacity:0.5; font-size:0.85rem;">
+            《时之笛》是时间线的分歧点。林克的抉择创造了三个平行世界——<br>
+            <span class="red">败北线</span> · <span class="green">童年线</span> · <span class="blue">成年线</span>，再加上<span class="purple">万年后</span>的旷野时代。
+        </p>
+
+        <!-- Branch overview -->
+        <div class="branch-container">
+            <div class="branch-card defeated">
+                <h4 class="red">⚔ 败北线</h4>
+                <p>林克败于加农，三角力量落入魔王之手。黑暗纪元持续蔓延。代表作品：众神的三角力量、织梦岛</p>
+            </div>
+            <div class="branch-card child">
+                <h4 class="green">🌱 童年线</h4>
+                <p>林克被送回童年，加农被封印。勇者继续另一段冒险。代表作品：姆吉拉的假面、黄昏公主</p>
+            </div>
+            <div class="branch-card adult">
+                <h4 class="blue">🌊 成年线</h4>
+                <p>林克不在的成年时代，海拉鲁被洪水淹没。代表作品：风之杖、幻影沙漏</p>
+            </div>
+            <div class="branch-card wild">
+                <h4 class="purple">🌄 旷野时代</h4>
+                <p>万年后，所有时间线汇聚于一处。灾厄盖侬苏醒，林克从百年沉眠中醒来。代表作品：旷野之息、王国之泪</p>
+            </div>
+        </div>
+
+        <!-- Detailed Timeline -->
+        <div class="timeline" style="margin-top:50px;">
+
+            <!-- Unified -->
+            <div class="timeline-item">
+                <div class="timeline-dot" style="box-shadow:0 0 12px rgba(240,192,64,0.4);"></div>
+                <span class="timeline-era era-unified">太古 · 创世</span>
+                <h3>天空之剑</h3>
+                <div class="sub">Skyward Sword · 万年前</div>
+                <p>海利亚女神与魔王终焉者的大战。女神将地面升入天空，封印魔王。林克——这个时代的初代勇者——拔出女神之剑，铸就大师之剑的雏形。塞尔达公主作为女神的转世第一次登场。</p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot" style="box-shadow:0 0 12px rgba(240,192,64,0.4);"></div>
+                <span class="timeline-era era-unified">远古 · 封印战争</span>
+                <h3>缩小帽 / 四支剑 / 众神的三角力量</h3>
+                <div class="sub">Minish Cap → Four Swords → ALttP（背景）</div>
+                <p>皮克罗族降临、风之族的繁荣与衰落、古夫与米海拉王的故事。三角力量被封印在黄金之地，加农一族开始了对力量的追逐。这是——<span class="gold">一切的开始</span>。</p>
+            </div>
+
+            <!-- THE SPLIT -->
+            <div class="timeline-item" style="margin-bottom:60px;">
+                <div class="timeline-dot" style="width:20px;height:20px;left:-37px;background:#ffd700;box-shadow:0 0 24px rgba(240,192,64,0.6);"></div>
+                <span class="timeline-era era-unified" style="background:rgba(240,192,64,0.2);border-color:rgba(240,192,64,0.5);">⚡ 分歧点</span>
+                <h3 style="font-size:1.3rem;">时之笛</h3>
+                <div class="sub">Ocarina of Time · 时间线的分叉路口</div>
+                <p>塞尔达传说系列中最伟大的作品。林克穿越时空，七年后与加农多夫决战。<br>
+                加农被打败，但时间线在此刻——<span class="gold">分裂了</span>。<br>
+                <span style="opacity:0.5;font-size:0.85rem;">林克被封印的七年后的战斗结果，创造了三个完全不同的世界线。</span></p>
+            </div>
+
+            <!-- Defeated Line -->
+            <div class="timeline-item defeated">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-defeated">败北线 · 林克败北</span>
+                <h3 style="color:#f87171;">众神的三角力量</h3>
+                <div class="sub">A Link to the Past</div>
+                <p>加农获得完整的三角力量，黑暗笼罩海拉鲁。新一代勇者林克唤醒大师之剑，穿越光明与黑暗两个世界，夺回三角力量。</p>
+            </div>
+
+            <div class="timeline-item defeated">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-defeated">败北线</span>
+                <h3 style="color:#f87171;">织梦岛 / 神秘果实 / 众神三角力量2</h3>
+                <div class="sub">Link's Awakening → Oracle → ALBW</div>
+                <p>林克的冒险跨越岛屿、时间、四季。在织梦岛上，他发现自己身处一场巨大的梦境之中。这是败北线中风格最多样的冒险篇章。</p>
+            </div>
+
+            <div class="timeline-item defeated">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-defeated">败北线 · 终章</span>
+                <h3 style="color:#f87171;">初代塞尔达 / 林克的冒险</h3>
+                <div class="sub">The Legend of Zelda → Zelda II</div>
+                <p>系列最初的起点。加农被封印后卷土重来，塞尔达公主被掳走。林克踏上海拉鲁全境的大冒险——这是所有后来冒险的<span class="gold">原型</span>。</p>
+            </div>
+
+            <!-- Child Line -->
+            <div class="timeline-item child">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-child">童年线 · 时空回溯</span>
+                <h3 style="color:#4ade80;">姆吉拉的假面</h3>
+                <div class="sub">Majora's Mask</div>
+                <p>时之笛后的林克被送回童年。他在迷失森林中追踪骷髅小子，坠入一个即将被月亮毁灭的异世界。三天——他只有<span class="gold">三天</span>来拯救这个世界。</p>
+            </div>
+
+            <div class="timeline-item child">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-child">童年线 · 百年之后</span>
+                <h3 style="color:#4ade80;">黄昏公主</h3>
+                <div class="sub">Twilight Princess</div>
+                <p>数百年后，影之世界侵蚀光之世界。林克化身为狼，与神秘的中介者米多娜一同探索真相。本作有着系列中最黑暗、最成熟的叙事风格。原作中童年的林克，已经化身为<span class="gold">黄昏的勇者之魂</span>。</p>
+            </div>
+
+            <div class="timeline-item child">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-child">童年线</span>
+                <h3 style="color:#4ade80;">四支剑冒险</h3>
+                <div class="sub">Four Swords Adventures</div>
+                <p>四位林克同台出演，四人合作的独特冒险。古夫再次归来，三角力量的力量再次被觊觎。</p>
+            </div>
+
+            <!-- Adult Line -->
+            <div class="timeline-item adult">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-adult">成年线 · 洪水纪元</span>
+                <h3 style="color:#60a5fa;">风之杖</h3>
+                <div class="sub">The Wind Waker</div>
+                <p>林克离开的成年时代，加农归来。女神下令降下洪水淹没海拉鲁。数百年后，海面上散落着岛屿。一个穿着绿衣的小男孩——新一世的林克——乘着小帆船，开始了寻找黄金三角的<span class="blue">海上冒险</span>。</p>
+            </div>
+
+            <div class="timeline-item adult">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-adult">成年线</span>
+                <h3 style="color:#60a5fa;">幻影沙漏 / 大地汽笛</h3>
+                <div class="sub">Phantom Hourglass → Spirit Tracks</div>
+                <p>风之杖的直接续作。林克与泰特拉的海上寻宝，以及百年之后一名火车司机林克与塞尔达公主共同对抗魔王的蒸汽朋克冒险。</p>
+            </div>
+
+            <!-- Wild Era -->
+            <div class="timeline-item wild">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-wild">旷野时代 · 万年后</span>
+                <h3 style="color:#a78bfa;">旷野之息</h3>
+                <div class="sub">Breath of the Wild · 灾厄盖侬苏醒</div>
+                <p>一万年后，所有时间线在此汇聚。灾厄盖侬再次苏醒，海拉鲁覆灭。林克在<span class="purple">百年沉眠</span>后醒来，失去所有记忆。他必须在广阔的海拉鲁大地上重新找回自己——找回战斗的技巧、找回过去的羁绊、找回<span class="gold">自己是谁</span>。</p>
+            </div>
+
+            <div class="timeline-item wild">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-wild">旷野时代 · 续章</span>
+                <h3 style="color:#a78bfa;">王国之泪</h3>
+                <div class="sub">Tears of the Kingdom · 封印之战再临</div>
+                <p>盖侬多夫在封印中积蓄力量，终于破封而出。大地崩裂，天空浮现浮岛。林克获得新的力量——<span class="gold">左纳乌科技</span>与<span class="purple">倒转乾坤</span>。天空、大地、深渊——三段式的探索开创了系列最宏大的冒险。塞尔达公主再次做出牺牲，穿越回远古时代，成为<span class="gold">白龙</span>修复大师之剑。</p>
+            </div>
+
+            <div class="timeline-item wild">
+                <div class="timeline-dot"></div>
+                <span class="timeline-era era-wild">旷野时代 · 新章</span>
+                <h3 style="color:#a78bfa;">智慧的再现</h3>
+                <div class="sub">Echoes of Wisdom · 塞尔达的冒险</div>
+                <p>系列史上第一次——<span class="gold">塞尔达公主成为主角</span>。裂谷吞噬海拉鲁，林克被困。塞尔达拿起三角力量权杖，使用"复制"的力量——再现各种物品和怪物来探索世界、解开谜题、拯救海拉鲁。这一次，轮到公主来拯救世界了。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 重大事件 ===== -->
+<section id="events">
+    <div class="container">
+        <h2 class="section-title">重大事件节点</h2>
+        <div class="events-grid">
+            <div class="event-card">
+                <div class="year">◆ 创世之初</div>
+                <h4>三位女神创造世界</h4>
+                <p>丁（力量）· 娜茹（智慧）· 芙洛尔（勇气）从混沌中创造天地，留下三角力量后离去。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 上古之战</div>
+                <h4>海利亚女神封印终焉者</h4>
+                <p>终焉者降临，女神海利亚牺牲不朽之身将其封印，灵魂转入凡世轮回。大师之剑的前身——女神之剑铸成。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 初代勇者</div>
+                <h4>天空之剑 · 林克拔出女神之剑</h4>
+                <p>第一位勇者在天空之城诞生。林克与塞尔达的宿命在此刻第一次相连。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 封印之战</div>
+                <h4>三角力量被封印在黄金之地</h4>
+                <p>海拉鲁王室将三角力量藏入圣地，加农一族开始了世世代代对力量的追逐。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 时间线的裂痕</div>
+                <h4>时之笛 · 时间线三分</h4>
+                <p>系列最关键的转折点。时之神殿、大师之剑、七年的穿越——林克的每一步都在重塑世界。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 洪水纪元</div>
+                <h4>女神降下洪水，海拉鲁沉入海底</h4>
+                <p>成年线中加农回归，三位女神降下灭世洪水。老海拉鲁长眠于波涛之下，新的世界在海面上诞生。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 百年沉眠</div>
+                <h4>灾厄盖侬苏醒，海拉鲁覆灭</h4>
+                <p>一万年后，灾厄盖侬突破封印。四英杰全灭，林克重伤。塞尔达独自支撑百年，将自己与盖侬封锁在海拉鲁城内。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 觉醒</div>
+                <h4>旷野之息 · 林克从神庙中苏醒</h4>
+                <p>百年后林克醒来，失去一切记忆。行走在沧海桑田的海拉鲁，找回记忆，解放四神兽，走向最终的决战。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 深渊之门</div>
+                <h4>王国之泪 · 盖侬多夫破封</h4>
+                <p>封印在地底的盖侬多夫完全复活。左纳乌的古文明浮现。塞尔达穿越回创世之初，化身白龙，用万年的孤独守护大师之剑。</p>
+            </div>
+            <div class="event-card">
+                <div class="year">◆ 重新开始</div>
+                <h4>智慧的再现 · 塞尔达成为勇者</h4>
+                <p>裂谷吞噬海拉鲁，林克陷落。塞尔达公主第一次拿起武器——不是剑，而是智慧的力量。海拉鲁的多重宇宙中，没有哪条规则是不能打破的。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== 时间线引语 ===== -->
+<section id="quote" style="padding:80px 0;text-align:center;">
+    <div class="container">
+        <p style="font-family:'Cinzel',serif;font-size:clamp(1rem,2.5vw,1.6rem);max-width:700px;margin:0 auto;opacity:0.6;letter-spacing:0.05em;line-height:1.8;">
+            "时间如同河流。<br>
+             勇者的灵魂在河底沉睡，<br>
+             当黑暗降临，他便苏醒。<br>
+             他的名字——叫<span class="gold">林克</span>。"
+        </p>
+        <p style="margin-top:24px;font-size:0.8rem;opacity:0.3;">—— 海拉鲁的古老传说</p>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="triforce">△</div>
+    <p style="font-family:'Cinzel',serif;letter-spacing:0.15em;font-size:0.85rem;opacity:0.5;margin-bottom:4px;">THE LEGEND OF ZELDA</p>
+    <p>zhczlx.com · 献给海拉鲁的勇者们</p>
+    <div class="hearts">❤️❤️❤️</div>
+    <p style="margin-top:16px;font-size:0.7rem;opacity:0.25;">△ 勇气 · ◇ 智慧 · □ 力量</p>
+</footer>
+
+<!-- ===== PARTICLES JS ===== -->
+<script>
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let w, h;
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+            this.opacity = Math.random() * 0.3 + 0.1;
+            this.life = 0;
+            this.maxLife = Math.random() * 300 + 200;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life++;
+            if (this.life > this.maxLife || this.x < -10 || this.x > w + 10 || this.y < -10 || this.y > h + 10) {
+                this.reset();
+            }
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(240, 192, 64, ${this.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    const count = Math.min(80, Math.floor(w * h / 15000));
+    for (let i = 0; i < count; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(p => { p.update(); p.draw(); });
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(240, 192, 64, ${0.05 * (1 - dist / 120)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+
 </body>
 </html>
