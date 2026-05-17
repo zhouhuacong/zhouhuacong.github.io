@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>颜色转换器 — 海拉鲁工具箱</title>
+    <title data-i18n="title">Color Converter — Hyrule Toolbox</title>
     <link rel="stylesheet" href="css/tools.css">
     <style>
         /* ===== COLOR CONVERTER SPECIFIC ===== */
@@ -253,6 +253,45 @@
             padding: 4px 0;
         }
 
+        /* Header controls: lang switcher + theme toggle */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .lang-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: border-color var(--transition-fast);
+        }
+        .lang-select:focus {
+            border-color: var(--accent);
+        }
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            line-height: 1;
+            transition: all var(--transition-fast);
+            font-family: var(--font-sans);
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .cc-input-row {
@@ -305,12 +344,23 @@
     <div class="header-inner">
         <a href="/" class="header-logo">
             <span class="logo-icon">🔧</span>
-            <span>海拉鲁工具箱</span>
+            <span data-i18n="siteName">Hyrule Toolbox</span>
         </a>
         <nav class="header-nav">
-            <a href="/">首页</a>
-            <a href="color-converter.html" class="active">颜色转换器</a>
+            <a href="/" data-i18n="navHome">Home</a>
+            <a href="color-converter.html" class="active" data-i18n="navConverter">Color Converter</a>
         </nav>
+        <div class="header-controls">
+            <select class="lang-select" id="langSelect" aria-label="Language">
+                <option value="en">EN</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+            </select>
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+        </div>
     </div>
 </header>
 
@@ -322,12 +372,12 @@
             <!-- Breadcrumb -->
             <div class="tool-header">
                 <div class="breadcrumb">
-                    <a href="/">首页</a>
+                    <a href="/" data-i18n="breadcrumbHome">Home</a>
                     <span>›</span>
-                    <span>颜色转换</span>
+                    <span data-i18n="breadcrumbCurrent">Color Converter</span>
                 </div>
-                <h1>🎨 颜色转换器</h1>
-                <p>在 HEX、RGB、HSL、CMYK 格式之间互转，支持实时预览与颜色历史记录。</p>
+                <h1 data-i18n="heading">🎨 Color Converter</h1>
+                <p data-i18n="description">Convert colors between HEX, RGB, HSL, and CMYK formats with real-time preview and color history.</p>
             </div>
 
             <!-- Tool Card -->
@@ -340,8 +390,8 @@
                             <input type="color" id="colorPicker" value="#3b82f6">
                         </div>
                         <div class="cc-text-wrap">
-                            <input type="text" id="colorInput" placeholder="#3b82f6 或 rgb(59,130,246) 或 hsl(217,91%,60%)" spellcheck="false" autocomplete="off">
-                            <span class="cc-format-hint">支持 HEX（#RRGGBB）、rgb()、hsl() 等格式，输入即自动转换</span>
+                            <input type="text" id="colorInput" placeholder="#3b82f6 or rgb(59,130,246) or hsl(217,91%,60%)" spellcheck="false" autocomplete="off" data-i18n-placeholder="inputPlaceholder">
+                            <span class="cc-format-hint" data-i18n="formatHint">Supports HEX (#RRGGBB), rgb(), hsl() and more — converts automatically as you type</span>
                         </div>
                     </div>
 
@@ -351,28 +401,28 @@
                             <div class="cc-swatch">
                                 <div class="swatch-fill" id="swatchFill" style="background:#3b82f6;"></div>
                             </div>
-                            <span class="cc-swatch-label" id="swatchLabel">实时预览</span>
+                            <span class="cc-swatch-label" id="swatchLabel">#3b82f6</span>
                         </div>
                         <div class="cc-values" id="valuesContainer">
                             <div class="cc-value-row" data-format="hex">
-                                <span class="cc-label">HEX</span>
+                                <span class="cc-label" data-i18n="labelHex">HEX</span>
                                 <span class="cc-value" id="valHex">#3b82f6</span>
-                                <button class="cc-copy-btn" title="复制 HEX" data-copy="#3b82f6">📋</button>
+                                <button class="cc-copy-btn" title="Copy HEX" data-i18n-title="copyHex" data-copy="#3b82f6">📋</button>
                             </div>
                             <div class="cc-value-row" data-format="rgb">
-                                <span class="cc-label">RGB</span>
+                                <span class="cc-label" data-i18n="labelRgb">RGB</span>
                                 <span class="cc-value" id="valRgb">rgb(59, 130, 246)</span>
-                                <button class="cc-copy-btn" title="复制 RGB" data-copy="rgb(59, 130, 246)">📋</button>
+                                <button class="cc-copy-btn" title="Copy RGB" data-i18n-title="copyRgb" data-copy="rgb(59, 130, 246)">📋</button>
                             </div>
                             <div class="cc-value-row" data-format="hsl">
-                                <span class="cc-label">HSL</span>
+                                <span class="cc-label" data-i18n="labelHsl">HSL</span>
                                 <span class="cc-value" id="valHsl">hsl(217, 91%, 60%)</span>
-                                <button class="cc-copy-btn" title="复制 HSL" data-copy="hsl(217, 91%, 60%)">📋</button>
+                                <button class="cc-copy-btn" title="Copy HSL" data-i18n-title="copyHsl" data-copy="hsl(217, 91%, 60%)">📋</button>
                             </div>
                             <div class="cc-value-row" data-format="cmyk">
-                                <span class="cc-label">CMYK</span>
+                                <span class="cc-label" data-i18n="labelCmyk">CMYK</span>
                                 <span class="cc-value" id="valCmyk">cmyk(76%, 47%, 0%, 4%)</span>
-                                <button class="cc-copy-btn" title="复制 CMYK" data-copy="cmyk(76%, 47%, 0%, 4%)">📋</button>
+                                <button class="cc-copy-btn" title="Copy CMYK" data-i18n-title="copyCmyk" data-copy="cmyk(76%, 47%, 0%, 4%)">📋</button>
                             </div>
                         </div>
                     </div>
@@ -380,11 +430,11 @@
                     <!-- Color History -->
                     <div class="cc-history-section">
                         <div class="cc-history-header">
-                            <h3>📜 颜色历史</h3>
-                            <button class="cc-history-clear" id="historyClearBtn" title="清空历史">清空</button>
+                            <h3 data-i18n="historyHeading">📜 Color History</h3>
+                            <button class="cc-history-clear" id="historyClearBtn" data-i18n="clearBtn" title="Clear history">Clear</button>
                         </div>
                         <div class="cc-history-items" id="historyContainer">
-                            <span class="cc-history-empty">暂无历史记录</span>
+                            <span class="cc-history-empty" data-i18n="historyEmpty">No history yet</span>
                         </div>
                     </div>
 
@@ -392,8 +442,8 @@
 
                 <!-- Footer hints -->
                 <div class="tool-footer">
-                    <span class="hint">🎨 点击色块或输入颜色值即可转换</span>
-                    <span class="hint">点击 📋 复制对应格式的值</span>
+                    <span class="hint" data-i18n="hint1">🎨 Click the color swatch or enter a color value to convert</span>
+                    <span class="hint" data-i18n="hint2">Click 📋 to copy the corresponding format value</span>
                 </div>
             </div>
 
@@ -404,11 +454,11 @@
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer">
     <div class="footer-inner">
-        <span>© 2026 海拉鲁工具箱 · 本地工具集</span>
+        <span data-i18n="footerText">© 2026 Hyrule Toolbox · Local Toolset</span>
         <span>
-            <a href="/">首页</a>
+            <a href="/" data-i18n="footerHome">Home</a>
             <span style="margin:0 6px;opacity:0.3;">·</span>
-            <span>颜色转换</span>
+            <span data-i18n="footerConverter">Color Converter</span>
         </span>
     </div>
 </footer>
@@ -416,6 +466,275 @@
 <script>
 (function() {
     'use strict';
+
+    // ===== I18N DICTIONARY =====
+    var i18n = {
+        en: {
+            title: 'Color Converter — Hyrule Toolbox',
+            siteName: 'Hyrule Toolbox',
+            navHome: 'Home',
+            navConverter: 'Color Converter',
+            breadcrumbHome: 'Home',
+            breadcrumbCurrent: 'Color Converter',
+            heading: '🎨 Color Converter',
+            description: 'Convert colors between HEX, RGB, HSL, and CMYK formats with real-time preview and color history.',
+            inputPlaceholder: '#3b82f6 or rgb(59,130,246) or hsl(217,91%,60%)',
+            formatHint: 'Supports HEX (#RRGGBB), rgb(), hsl() and more — converts automatically as you type',
+            labelHex: 'HEX',
+            labelRgb: 'RGB',
+            labelHsl: 'HSL',
+            labelCmyk: 'CMYK',
+            copyHex: 'Copy HEX',
+            copyRgb: 'Copy RGB',
+            copyHsl: 'Copy HSL',
+            copyCmyk: 'Copy CMYK',
+            historyHeading: '📜 Color History',
+            clearBtn: 'Clear',
+            historyEmpty: 'No history yet',
+            hint1: '🎨 Click the color swatch or enter a color value to convert',
+            hint2: 'Click 📋 to copy the corresponding format value',
+            footerText: '© 2026 Hyrule Toolbox · Local Toolset',
+            footerHome: 'Home',
+            footerConverter: 'Color Converter',
+            toastCopied: '✅ Copied: ',
+            toastCopyFail: '❌ Copy failed, please copy manually',
+            toastCleared: '🗑️ History cleared'
+        },
+        zh: {
+            title: '颜色转换器 — 海拉鲁工具箱',
+            siteName: '海拉鲁工具箱',
+            navHome: '首页',
+            navConverter: '颜色转换器',
+            breadcrumbHome: '首页',
+            breadcrumbCurrent: '颜色转换',
+            heading: '🎨 颜色转换器',
+            description: '在 HEX、RGB、HSL、CMYK 格式之间互转，支持实时预览与颜色历史记录。',
+            inputPlaceholder: '#3b82f6 或 rgb(59,130,246) 或 hsl(217,91%,60%)',
+            formatHint: '支持 HEX（#RRGGBB）、rgb()、hsl() 等格式，输入即自动转换',
+            labelHex: 'HEX',
+            labelRgb: 'RGB',
+            labelHsl: 'HSL',
+            labelCmyk: 'CMYK',
+            copyHex: '复制 HEX',
+            copyRgb: '复制 RGB',
+            copyHsl: '复制 HSL',
+            copyCmyk: '复制 CMYK',
+            historyHeading: '📜 颜色历史',
+            clearBtn: '清空',
+            historyEmpty: '暂无历史记录',
+            hint1: '🎨 点击色块或输入颜色值即可转换',
+            hint2: '点击 📋 复制对应格式的值',
+            footerText: '© 2026 海拉鲁工具箱 · 本地工具集',
+            footerHome: '首页',
+            footerConverter: '颜色转换',
+            toastCopied: '✅ 已复制: ',
+            toastCopyFail: '❌ 复制失败，请手动复制',
+            toastCleared: '🗑️ 历史记录已清空'
+        },
+        ja: {
+            title: 'カラーコンバーター — ハイラル工具箱',
+            siteName: 'ハイラル工具箱',
+            navHome: 'ホーム',
+            navConverter: 'カラーコンバーター',
+            breadcrumbHome: 'ホーム',
+            breadcrumbCurrent: 'カラー変換',
+            heading: '🎨 カラーコンバーター',
+            description: 'HEX、RGB、HSL、CMYK形式間で色を変換。リアルタイムプレビューと色履歴に対応。',
+            inputPlaceholder: '#3b82f6 または rgb(59,130,246) または hsl(217,91%,60%)',
+            formatHint: 'HEX（#RRGGBB）、rgb()、hsl() などに対応 — 入力すると自動変換',
+            labelHex: 'HEX',
+            labelRgb: 'RGB',
+            labelHsl: 'HSL',
+            labelCmyk: 'CMYK',
+            copyHex: 'HEXをコピー',
+            copyRgb: 'RGBをコピー',
+            copyHsl: 'HSLをコピー',
+            copyCmyk: 'CMYKをコピー',
+            historyHeading: '📜 色の履歴',
+            clearBtn: 'クリア',
+            historyEmpty: '履歴はまだありません',
+            hint1: '🎨 カラースウォッチをクリックするか、色の値を入力して変換',
+            hint2: '📋 をクリックして対応する形式の値をコピー',
+            footerText: '© 2026 ハイラル工具箱 · ローカルツールセット',
+            footerHome: 'ホーム',
+            footerConverter: 'カラー変換',
+            toastCopied: '✅ コピーしました: ',
+            toastCopyFail: '❌ コピーに失敗しました。手動でコピーしてください',
+            toastCleared: '🗑️ 履歴をクリアしました'
+        },
+        ko: {
+            title: '색상 변환기 — 하이랄 도구함',
+            siteName: '하이랄 도구함',
+            navHome: '홈',
+            navConverter: '색상 변환기',
+            breadcrumbHome: '홈',
+            breadcrumbCurrent: '색상 변환',
+            heading: '🎨 색상 변환기',
+            description: 'HEX, RGB, HSL, CMYK 형식 간 색상을 변환합니다. 실시간 미리보기 및 색상 기록 지원.',
+            inputPlaceholder: '#3b82f6 또는 rgb(59,130,246) 또는 hsl(217,91%,60%)',
+            formatHint: 'HEX (#RRGGBB), rgb(), hsl() 등 지원 — 입력 시 자동 변환',
+            labelHex: 'HEX',
+            labelRgb: 'RGB',
+            labelHsl: 'HSL',
+            labelCmyk: 'CMYK',
+            copyHex: 'HEX 복사',
+            copyRgb: 'RGB 복사',
+            copyHsl: 'HSL 복사',
+            copyCmyk: 'CMYK 복사',
+            historyHeading: '📜 색상 기록',
+            clearBtn: '지우기',
+            historyEmpty: '기록이 없습니다',
+            hint1: '🎨 색상 견본을 클릭하거나 색상 값을 입력하여 변환',
+            hint2: '📋를 클릭하여 해당 형식의 값을 복사',
+            footerText: '© 2026 하이랄 도구함 · 로컬 도구 세트',
+            footerHome: '홈',
+            footerConverter: '색상 변환',
+            toastCopied: '✅ 복사됨: ',
+            toastCopyFail: '❌ 복사 실패, 수동으로 복사해 주세요',
+            toastCleared: '🗑️ 기록이 지워졌습니다'
+        },
+        fr: {
+            title: 'Convertisseur de couleurs — Boîte à outils d\'Hyrule',
+            siteName: 'Boîte à outils d\'Hyrule',
+            navHome: 'Accueil',
+            navConverter: 'Convertisseur de couleurs',
+            breadcrumbHome: 'Accueil',
+            breadcrumbCurrent: 'Conversion de couleurs',
+            heading: '🎨 Convertisseur de couleurs',
+            description: 'Convertissez les couleurs entre les formats HEX, RGB, HSL et CMYK avec un aperçu en temps réel et un historique des couleurs.',
+            inputPlaceholder: '#3b82f6 ou rgb(59,130,246) ou hsl(217,91%,60%)',
+            formatHint: 'Prend en charge HEX (#RRGGBB), rgb(), hsl() et plus — conversion automatique à la saisie',
+            labelHex: 'HEX',
+            labelRgb: 'RVB',
+            labelHsl: 'TSL',
+            labelCmyk: 'CMJN',
+            copyHex: 'Copier HEX',
+            copyRgb: 'Copier RVB',
+            copyHsl: 'Copier TSL',
+            copyCmyk: 'Copier CMJN',
+            historyHeading: '📜 Historique des couleurs',
+            clearBtn: 'Effacer',
+            historyEmpty: 'Aucun historique',
+            hint1: '🎨 Cliquez sur l\'échantillon ou saisissez une couleur pour convertir',
+            hint2: 'Cliquez sur 📋 pour copier la valeur correspondante',
+            footerText: '© 2026 Boîte à outils d\'Hyrule · Ensemble d\'outils local',
+            footerHome: 'Accueil',
+            footerConverter: 'Conversion de couleurs',
+            toastCopied: '✅ Copié : ',
+            toastCopyFail: '❌ Échec de la copie, veuillez copier manuellement',
+            toastCleared: '🗑️ Historique effacé'
+        },
+        de: {
+            title: 'Farbkonverter — Hyrule-Werkzeugkiste',
+            siteName: 'Hyrule-Werkzeugkiste',
+            navHome: 'Startseite',
+            navConverter: 'Farbkonverter',
+            breadcrumbHome: 'Startseite',
+            breadcrumbCurrent: 'Farbkonverter',
+            heading: '🎨 Farbkonverter',
+            description: 'Konvertieren Sie Farben zwischen HEX-, RGB-, HSL- und CMYK-Formaten mit Echtzeitvorschau und Farbverlauf.',
+            inputPlaceholder: '#3b82f6 oder rgb(59,130,246) oder hsl(217,91%,60%)',
+            formatHint: 'Unterstützt HEX (#RRGGBB), rgb(), hsl() und mehr — automatische Konvertierung bei Eingabe',
+            labelHex: 'HEX',
+            labelRgb: 'RGB',
+            labelHsl: 'HSL',
+            labelCmyk: 'CMYK',
+            copyHex: 'HEX kopieren',
+            copyRgb: 'RGB kopieren',
+            copyHsl: 'HSL kopieren',
+            copyCmyk: 'CMYK kopieren',
+            historyHeading: '📜 Farbverlauf',
+            clearBtn: 'Löschen',
+            historyEmpty: 'Noch kein Verlauf',
+            hint1: '🎨 Klicken Sie auf das Farbfeld oder geben Sie einen Farbwert zur Konvertierung ein',
+            hint2: 'Klicken Sie auf 📋, um den entsprechenden Formatwert zu kopieren',
+            footerText: '© 2026 Hyrule-Werkzeugkiste · Lokales Werkzeugset',
+            footerHome: 'Startseite',
+            footerConverter: 'Farbkonverter',
+            toastCopied: '✅ Kopiert: ',
+            toastCopyFail: '❌ Kopieren fehlgeschlagen, bitte manuell kopieren',
+            toastCleared: '🗑️ Verlauf gelöscht'
+        }
+    };
+
+    // ===== I18N HELPERS =====
+
+    function getDefaultLang() {
+        try {
+            var saved = localStorage.getItem('cc-lang');
+            if (saved && i18n[saved]) return saved;
+        } catch (e) { /* noop */ }
+        return 'en';
+    }
+
+    function setLangPref(lang) {
+        try { localStorage.setItem('cc-lang', lang); } catch (e) { /* noop */ }
+    }
+
+    function t(key) {
+        var lang = currentLang;
+        if (i18n[lang] && i18n[lang][key] !== undefined) {
+            return i18n[lang][key];
+        }
+        // Fallback to English
+        if (i18n.en && i18n.en[key] !== undefined) {
+            return i18n.en[key];
+        }
+        return key;
+    }
+
+    function translate() {
+        // Update textContent for elements with data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            el.textContent = t(key);
+        });
+        // Update placeholder for elements with data-i18n-placeholder
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n-placeholder');
+            el.placeholder = t(key);
+        });
+        // Update title for elements with data-i18n-title
+        document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n-title');
+            el.title = t(key);
+        });
+        // Update document title
+        var titleEl = document.querySelector('title');
+        if (titleEl) {
+            titleEl.textContent = t('title');
+        }
+    }
+
+    var currentLang = getDefaultLang();
+
+    // ===== THEME TOGGLE =====
+
+    function getDefaultTheme() {
+        try {
+            var saved = localStorage.getItem('cc-theme');
+            if (saved === 'dark' || saved === 'light') return saved;
+        } catch (e) { /* noop */ }
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    }
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        try { localStorage.setItem('cc-theme', theme); } catch (e) { /* noop */ }
+        var btn = document.getElementById('themeToggle');
+        if (btn) {
+            btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+    }
+
+    function toggleTheme() {
+        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        setTheme(current === 'dark' ? 'light' : 'dark');
+    }
 
     // ===== DOM REFS =====
     const colorPicker   = document.getElementById('colorPicker');
@@ -452,7 +771,7 @@
     }
 
     function hexToRgb(hex) {
-        var match = hex.replace(/^#/, '').match(/^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+        var match = hex.replace(/^#/, '').match(/^([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i);
         if (!match) return null;
         return {
             r: parseInt(match[1], 16),
@@ -545,7 +864,7 @@
         str = str.trim();
 
         // HEX (#RGB, #RRGGBB)
-        var hexMatch = str.match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
+        var hexMatch = str.match(/^#?([a-f\\d]{3}|[a-f\\d]{6})$/i);
         if (hexMatch) {
             var hex = hexMatch[1];
             if (hex.length === 3) {
@@ -557,7 +876,7 @@
 
         // rgb() / rgba()
         var rgbMatch = str.match(
-            /^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*[\d.]+)?\s*\)$/i
+            /^rgba?\\s*\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})(?:\\s*,\\s*[\\d.]+)?\\s*\\)$/i
         );
         if (rgbMatch) {
             return {
@@ -569,7 +888,7 @@
 
         // hsl() / hsla()
         var hslMatch = str.match(
-            /^hsla?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%(?:\s*,\s*[\d.]+)?\s*\)$/i
+            /^hsla?\\s*\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})%\\s*,\\s*(\\d{1,3})%(?:\\s*,\\s*[\\d.]+)?\\s*\\)$/i
         );
         if (hslMatch) {
             var h = clamp(parseInt(hslMatch[1], 10), 0, 360);
@@ -670,7 +989,7 @@
                     btnEl.classList.add('copied');
                     setTimeout(function() { btnEl.classList.remove('copied'); }, 1200);
                 }
-                showToast('✅ 已复制: ' + text);
+                showToast(t('toastCopied') + text);
             }).catch(function() {
                 fallbackCopy(text, btnEl);
             });
@@ -694,9 +1013,9 @@
                 btnEl.classList.add('copied');
                 setTimeout(function() { btnEl.classList.remove('copied'); }, 1200);
             }
-            showToast('✅ 已复制: ' + text);
+            showToast(t('toastCopied') + text);
         } catch (e) {
-            showToast('❌ 复制失败，请手动复制');
+            showToast(t('toastCopyFail'));
         }
         document.body.removeChild(ta);
     }
@@ -748,7 +1067,7 @@
     function renderHistory() {
         var history = getHistory();
         if (history.length === 0) {
-            historyContainer.innerHTML = '<span class="cc-history-empty">暂无历史记录</span>';
+            historyContainer.innerHTML = '<span class="cc-history-empty" data-i18n="historyEmpty">' + t('historyEmpty') + '</span>';
             return;
         }
         var html = '';
@@ -777,12 +1096,35 @@
     historyClearBtn.addEventListener('click', function() {
         setHistory([]);
         renderHistory();
-        showToast('🗑️ 历史记录已清空');
+        showToast(t('toastCleared'));
     });
+
+    // ===== LANG SWITCHER =====
+
+    var langSelect = document.getElementById('langSelect');
+
+    langSelect.addEventListener('change', function() {
+        currentLang = langSelect.value;
+        setLangPref(currentLang);
+        translate();
+        // Re-render history to update "no history" text
+        renderHistory();
+    });
+
+    // ===== THEME TOGGLE INIT =====
+
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
     // ===== INIT =====
 
     function init() {
+        // Set initial language
+        langSelect.value = currentLang;
+        translate();
+
+        // Set initial theme
+        setTheme(getDefaultTheme());
+
         var history = getHistory();
         if (history.length > 0) {
             var first = history[0];

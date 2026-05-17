@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>字数统计 — 海拉鲁工具箱</title>
+    <title>Text Counter — Hyrule Toolbox</title>
     <link rel="stylesheet" href="css/tools.css">
     <style>
         /* ===== TEXT COUNTER SPECIFIC ===== */
@@ -283,6 +283,49 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+
+        /* Header actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .lang-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color var(--transition-fast);
+        }
+        .lang-select:hover,
+        .lang-select:focus {
+            border-color: var(--accent);
+        }
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .btn-icon:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-tertiary);
+        }
     </style>
 </head>
 <body>
@@ -295,12 +338,23 @@
     <div class="header-inner">
         <a href="/" class="header-logo">
             <span class="logo-icon">🔧</span>
-            <span>海拉鲁工具箱</span>
+            <span id="siteName">Hyrule Toolbox</span>
         </a>
         <nav class="header-nav">
-            <a href="/">首页</a>
-            <a href="text-counter.html" class="active">字数统计</a>
+            <a href="/" id="navHome">Home</a>
+            <a href="text-counter.html" class="active" id="navCounter">Text Counter</a>
         </nav>
+        <div class="header-actions">
+            <select id="langSwitcher" class="lang-select" aria-label="Language">
+                <option value="en">EN</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+            </select>
+            <button id="themeToggle" class="btn-icon" title="Toggle theme">🌙</button>
+        </div>
     </div>
 </header>
 
@@ -312,12 +366,12 @@
             <!-- Breadcrumb -->
             <div class="tool-header">
                 <div class="breadcrumb">
-                    <a href="/">首页</a>
+                    <a href="/" id="breadHome">Home</a>
                     <span>›</span>
-                    <span>字数统计</span>
+                    <span id="breadCounter">Text Counter</span>
                 </div>
-                <h1>📊 字数统计</h1>
-                <p>实时统计字符数、单词数、行数、段落数，支持中文/英文混合文本分析。</p>
+                <h1>📊 <span id="pageTitle">Text Counter</span></h1>
+                <p id="toolDesc">Count characters, words, sentences, paragraphs, and lines in real time. Supports mixed Chinese/English text.</p>
             </div>
 
             <!-- Tool Card -->
@@ -326,70 +380,70 @@
 
                     <!-- Textarea -->
                     <div class="textarea-wrap">
-                        <textarea class="counter-textarea" id="textInput" placeholder="在此输入或粘贴文本，实时统计将自动开始…" spellcheck="false"></textarea>
-                        <span class="char-count" id="charCountLabel">0 字符</span>
+                        <textarea class="counter-textarea" id="textInput" placeholder="Type or paste text here, stats update in real time…" spellcheck="false"></textarea>
+                        <span class="char-count" id="charCountLabel">0 characters</span>
                     </div>
 
                     <!-- Action Bar -->
                     <div class="action-bar">
-                        <button class="btn-action btn-danger" id="clearBtn" title="清空内容">🗑️ 清空</button>
-                        <button class="btn-action" id="copyBtn" title="复制文本">📋 复制</button>
-                        <button class="btn-action btn-primary" id="pasteBtn" title="从剪贴板粘贴">📥 粘贴</button>
+                        <button class="btn-action btn-danger" id="clearBtn" title="Clear">🗑️ <span id="btnClear">Clear</span></button>
+                        <button class="btn-action" id="copyBtn" title="Copy">📋 <span id="btnCopy">Copy</span></button>
+                        <button class="btn-action btn-primary" id="pasteBtn" title="Paste">📥 <span id="btnPaste">Paste</span></button>
                     </div>
 
                     <!-- Stats Grid -->
                     <div class="stats-grid" id="statsGrid">
                         <div class="stat-card">
                             <div class="stat-value" id="statChars">0</div>
-                            <div class="stat-label">字符数</div>
-                            <div class="stat-sub">含空格</div>
+                            <div class="stat-label" id="labelChars">Characters</div>
+                            <div class="stat-sub" id="labelCharsWith">with spaces</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statCharsNoSpace">0</div>
-                            <div class="stat-label">字符数</div>
-                            <div class="stat-sub">不含空格</div>
+                            <div class="stat-label" id="labelCharsNoSpace">Characters</div>
+                            <div class="stat-sub" id="labelCharsWithout">without spaces</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statWords">0</div>
-                            <div class="stat-label">单词数</div>
-                            <div class="stat-sub">词</div>
+                            <div class="stat-label" id="labelWords">Words</div>
+                            <div class="stat-sub" id="labelWordsSub">words</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statSentences">0</div>
-                            <div class="stat-label">句子数</div>
-                            <div class="stat-sub">句</div>
+                            <div class="stat-label" id="labelSentences">Sentences</div>
+                            <div class="stat-sub" id="labelSentencesSub">sentences</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statParagraphs">0</div>
-                            <div class="stat-label">段落数</div>
-                            <div class="stat-sub">段</div>
+                            <div class="stat-label" id="labelParagraphs">Paragraphs</div>
+                            <div class="stat-sub" id="labelParagraphsSub">paragraphs</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-value" id="statLines">0</div>
-                            <div class="stat-label">行数</div>
-                            <div class="stat-sub">行</div>
+                            <div class="stat-label" id="labelLines">Lines</div>
+                            <div class="stat-sub" id="labelLinesSub">lines</div>
                         </div>
                     </div>
 
                     <!-- Reading Time -->
                     <div class="reading-time" id="readingTimeBox">
                         <span class="rt-icon">⏱️</span>
-                        <span class="rt-text">大约 <strong id="readingTime">0 秒</strong> 阅读时间</span>
-                        <span class="rt-detail" id="readingDetail">基于 200 词/分钟</span>
+                        <span class="rt-text" id="readingTimeLabel">About <strong id="readingTime">0 sec</strong> reading time</span>
+                        <span class="rt-detail" id="readingDetail">Based on 200 words/min</span>
                     </div>
 
                     <!-- Word Frequency -->
-                    <div class="section-divider">🏆 高频词汇 Top 10</div>
+                    <div class="section-divider"><span id="freqHeading">🏆 Top Frequent Words</span></div>
                     <div class="freq-list" id="freqList">
-                        <span class="freq-empty">输入文本后将显示高频词汇</span>
+                        <span class="freq-empty" id="freqEmpty">Enter text to see frequent words</span>
                     </div>
 
                 </div>
 
                 <!-- Footer hint -->
                 <div class="tool-footer">
-                    <span class="hint">🔒 所有统计均在本地完成，文本不会上传到服务器</span>
-                    <span class="hint">支持中英文混合分析</span>
+                    <span class="hint" id="hintPrivacy">🔒 All stats computed locally, text never leaves your device</span>
+                    <span class="hint" id="hintLang">Supports mixed Chinese/English analysis</span>
                 </div>
             </div>
 
@@ -400,18 +454,343 @@
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer">
     <div class="footer-inner">
-        <span>© 2026 海拉鲁工具箱 · 本地工具集</span>
+        <span id="footerCopyright">© 2026 Hyrule Toolbox · Local Tools</span>
         <span>
-            <a href="/">首页</a>
+            <a href="/" id="footerHome">Home</a>
             <span style="margin:0 6px;opacity:0.3;">·</span>
-            <span>字数统计</span>
+            <span id="footerCounter">Text Counter</span>
         </span>
     </div>
 </footer>
 
 <script>
+// ===== I18N DICTIONARY =====
+var I18N = {
+    en: {
+        pageTitle: 'Text Counter',
+        siteName: 'Hyrule Toolbox',
+        navHome: 'Home',
+        navCounter: 'Text Counter',
+        breadHome: 'Home',
+        breadCounter: 'Text Counter',
+        toolDesc: 'Count characters, words, sentences, paragraphs, and lines in real time. Supports mixed Chinese/English text.',
+        labelChars: 'Characters',
+        labelCharsWith: 'with spaces',
+        labelCharsNoSpace: 'Characters',
+        labelCharsWithout: 'without spaces',
+        labelWords: 'Words',
+        labelWordsSub: 'words',
+        labelSentences: 'Sentences',
+        labelSentencesSub: 'sentences',
+        labelParagraphs: 'Paragraphs',
+        labelParagraphsSub: 'paragraphs',
+        labelLines: 'Lines',
+        labelLinesSub: 'lines',
+        readingTimeLabel: 'About {time} reading time',
+        readingDetail: 'Based on {wpm} words/min',
+        btnClear: 'Clear',
+        btnCopy: 'Copy',
+        btnPaste: 'Paste',
+        freqHeading: '🏆 Top Frequent Words',
+        freqEmpty: 'Enter text to see frequent words',
+        hintPrivacy: '🔒 All stats computed locally, text never leaves your device',
+        hintLang: 'Supports mixed Chinese/English analysis',
+        footerCopyright: '© 2026 Hyrule Toolbox · Local Tools',
+        footerHome: 'Home',
+        footerCounter: 'Text Counter',
+        placeholder: 'Type or paste text here, stats update in real time\u2026',
+        charCount: '{n} characters',
+        reading0: '0 sec',
+        readingSec: '{n} sec',
+        readingMin: '{n} min',
+        readingMinSec: '{m} min {s} sec',
+        readingDetail0: 'Based on 200 words/min',
+        readingDetailSec: 'About {n} sec (based on 200 words/min)',
+        readingDetailMin: 'About {m} min{s} (based on 200 words/min)',
+        toastCleared: '\uD83D\uDDD1\uFE0F Cleared',
+        toastNoContent: 'Nothing to copy',
+        toastCopied: '\uD83D\uDCCB Copied to clipboard',
+        toastCopyFailed: '\u274C Copy failed, please copy manually',
+        toastPasted: '\uD83D\uDCE5 Pasted {n} characters',
+        toastClipboardEmpty: 'Clipboard is empty',
+        toastClipboardDenied: '\u274C Cannot read clipboard, use Ctrl+V',
+        toastClipboardFallback: 'Use Ctrl+V to paste',
+    },
+    zh: {
+        pageTitle: '\u5B57\u6570\u7EDF\u8BA1',
+        siteName: '\u6D77\u62C9\u9C81\u5DE5\u5177\u7BB1',
+        navHome: '\u9996\u9875',
+        navCounter: '\u5B57\u6570\u7EDF\u8BA1',
+        breadHome: '\u9996\u9875',
+        breadCounter: '\u5B57\u6570\u7EDF\u8BA1',
+        toolDesc: '\u5B9E\u65F6\u7EDF\u8BA1\u5B57\u7B26\u6570\u3001\u5355\u8BCD\u6570\u3001\u884C\u6570\u3001\u6BB5\u843D\u6570\uFF0C\u652F\u6301\u4E2D\u6587/\u82F1\u6587\u6DF7\u5408\u6587\u672C\u5206\u6790\u3002',
+        labelChars: '\u5B57\u7B26\u6570',
+        labelCharsWith: '\u542B\u7A7A\u683C',
+        labelCharsNoSpace: '\u5B57\u7B26\u6570',
+        labelCharsWithout: '\u4E0D\u542B\u7A7A\u683C',
+        labelWords: '\u5355\u8BCD\u6570',
+        labelWordsSub: '\u8BCD',
+        labelSentences: '\u53E5\u5B50\u6570',
+        labelSentencesSub: '\u53E5',
+        labelParagraphs: '\u6BB5\u843D\u6570',
+        labelParagraphsSub: '\u6BB5',
+        labelLines: '\u884C\u6570',
+        labelLinesSub: '\u884C',
+        readingTimeLabel: '\u5927\u7EA6 {time} \u9605\u8BFB\u65F6\u95F4',
+        readingDetail: '\u57FA\u4E8E {wpm} \u8BCD/\u5206\u949F',
+        btnClear: '\u6E05\u7A7A',
+        btnCopy: '\u590D\u5236',
+        btnPaste: '\u7C98\u8D34',
+        freqHeading: '\uD83C\uDFC6 \u9AD8\u9891\u8BCD\u6C47 Top 10',
+        freqEmpty: '\u8F93\u5165\u6587\u672C\u540E\u5C06\u663E\u793A\u9AD8\u9891\u8BCD\u6C47',
+        hintPrivacy: '\uD83D\uDD12 \u6240\u6709\u7EDF\u8BA1\u5747\u5728\u672C\u5730\u5B8C\u6210\uFF0C\u6587\u672C\u4E0D\u4F1A\u4E0A\u4F20\u5230\u670D\u52A1\u5668',
+        hintLang: '\u652F\u6301\u4E2D\u82F1\u6587\u6DF7\u5408\u5206\u6790',
+        footerCopyright: '\u00A9 2026 \u6D77\u62C9\u9C81\u5DE5\u5177\u7BB1 \u00B7 \u672C\u5730\u5DE5\u5177\u96C6',
+        footerHome: '\u9996\u9875',
+        footerCounter: '\u5B57\u6570\u7EDF\u8BA1',
+        placeholder: '\u5728\u6B64\u8F93\u5165\u6216\u7C98\u8D34\u6587\u672C\uFF0C\u5B9E\u65F6\u7EDF\u8BA1\u5C06\u81EA\u52A8\u5F00\u59CB\u2026',
+        charCount: '{n} \u5B57\u7B26',
+        reading0: '0 \u79D2',
+        readingSec: '{n} \u79D2',
+        readingMin: '{n} \u5206\u949F',
+        readingMinSec: '{m} \u5206 {s} \u79D2',
+        readingDetail0: '\u57FA\u4E8E 200 \u8BCD/\u5206\u949F',
+        readingDetailSec: '\u7EA6 {n} \u79D2\uFF08\u57FA\u4E8E 200 \u8BCD/\u5206\u949F\uFF09',
+        readingDetailMin: '\u7EA6 {m} \u5206{s}\uFF08\u57FA\u4E8E 200 \u8BCD/\u5206\u949F\uFF09',
+        toastCleared: '\uD83D\uDDD1\uFE0F \u5DF2\u6E05\u7A7A',
+        toastNoContent: '\u6CA1\u6709\u53EF\u590D\u5236\u7684\u5185\u5BB9',
+        toastCopied: '\uD83D\uDCCB \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F',
+        toastCopyFailed: '\u274C \u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u590D\u5236',
+        toastPasted: '\uD83D\uDCE5 \u5DF2\u7C98\u8D34 {n} \u4E2A\u5B57\u7B26',
+        toastClipboardEmpty: '\u526A\u8D34\u677F\u4E3A\u7A7A',
+        toastClipboardDenied: '\u274C \u65E0\u6CD5\u8BFB\u53D6\u526A\u8D34\u677F\uFF0C\u8BF7\u4F7F\u7528 Ctrl+V \u7C98\u8D34',
+        toastClipboardFallback: '\u8BF7\u4F7F\u7528 Ctrl+V \u7C98\u8D34',
+    },
+    ja: {
+        pageTitle: '\u6587\u5B57\u30AB\u30A6\u30F3\u30BF\u30FC',
+        siteName: '\u30CF\u30A4\u30E9\u30EB\u30C4\u30FC\u30EB\u30DC\u30C3\u30AF\u30B9',
+        navHome: '\u30DB\u30FC\u30E0',
+        navCounter: '\u6587\u5B57\u30AB\u30A6\u30F3\u30BF\u30FC',
+        breadHome: '\u30DB\u30FC\u30E0',
+        breadCounter: '\u6587\u5B57\u30AB\u30A6\u30F3\u30BF\u30FC',
+        toolDesc: '\u6587\u5B57\u6570\u3001\u5358\u8A9E\u6570\u3001\u6587\u6570\u3001\u6BB5\u843D\u6570\u3001\u884C\u6570\u3092\u30EA\u30A2\u30EB\u30BF\u30A4\u30E0\u306B\u30AB\u30A6\u30F3\u30C8\u3002\u4E2D\u6587\u30FB\u82F1\u6587\u6DF7\u5408\u30C6\u30AD\u30B9\u30C8\u306B\u5BFE\u5FDC\u3002',
+        labelChars: '\u6587\u5B57\u6570',
+        labelCharsWith: '\u30B9\u30DA\u30FC\u30B9\u542B\u3080',
+        labelCharsNoSpace: '\u6587\u5B57\u6570',
+        labelCharsWithout: '\u30B9\u30DA\u30FC\u30B9\u9664\u304F',
+        labelWords: '\u5358\u8A9E\u6570',
+        labelWordsSub: '\u5358\u8A9E',
+        labelSentences: '\u6587\u6570',
+        labelSentencesSub: '\u6587',
+        labelParagraphs: '\u6BB5\u843D\u6570',
+        labelParagraphsSub: '\u6BB5\u843D',
+        labelLines: '\u884C\u6570',
+        labelLinesSub: '\u884C',
+        readingTimeLabel: '\u7D04 {time} \u306E\u8AAD\u66F8\u6642\u9593',
+        readingDetail: '{wpm} \u8A9E/\u5206 \u57FA\u6E96',
+        btnClear: '\u30AF\u30EA\u30A2',
+        btnCopy: '\u30B3\u30D4\u30FC',
+        btnPaste: '\u30DA\u30FC\u30B9\u30C8',
+        freqHeading: '\uD83C\uDFC6 \u983B\u51FA\u5358\u8A9E\u30C8\u30C3\u30D7',
+        freqEmpty: '\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B\u3059\u308B\u3068\u983B\u51FA\u5358\u8A9E\u304C\u8868\u793A\u3055\u308C\u307E\u3059',
+        hintPrivacy: '\uD83D\uDD12 \u3059\u3079\u3066\u306E\u7D71\u8A08\u306F\u30ED\u30FC\u30AB\u30EB\u3067\u51E6\u7406\u3055\u308C\u3001\u30C6\u30AD\u30B9\u30C8\u304C\u30B5\u30FC\u30D0\u30FC\u306B\u9001\u4FE1\u3055\u308C\u308B\u3053\u3068\u306F\u3042\u308A\u307E\u305B\u3093',
+        hintLang: '\u4E2D\u6587\u30FB\u82F1\u6587\u6DF7\u5408\u5206\u6790\u306B\u5BFE\u5FDC',
+        footerCopyright: '\u00A9 2026 \u30CF\u30A4\u30E9\u30EB\u30C4\u30FC\u30EB\u30DC\u30C3\u30AF\u30B9 \u00B7 \u30ED\u30FC\u30AB\u30EB\u30C4\u30FC\u30EB',
+        footerHome: '\u30DB\u30FC\u30E0',
+        footerCounter: '\u6587\u5B57\u30AB\u30A6\u30F3\u30BF\u30FC',
+        placeholder: '\u3053\u3053\u306B\u30C6\u30AD\u30B9\u30C8\u3092\u5165\u529B\u307E\u305F\u306F\u8CBC\u308A\u4ED8\u3051\u3001\u30EA\u30A2\u30EB\u30BF\u30A4\u30E0\u3067\u7D71\u8A08\u304C\u66F4\u65B0\u3055\u308C\u307E\u3059\u2026',
+        charCount: '{n} \u6587\u5B57',
+        reading0: '0 \u79D2',
+        readingSec: '{n} \u79D2',
+        readingMin: '{n} \u5206',
+        readingMinSec: '{m} \u5206 {s} \u79D2',
+        readingDetail0: '200 \u8A9E/\u5206 \u57FA\u6E96',
+        readingDetailSec: '\u7D04 {n} \u79D2\uFF08200 \u8A9E/\u5206 \u57FA\u6E96\uFF09',
+        readingDetailMin: '\u7D04 {m} \u5206{s}\uFF08200 \u8A9E/\u5206 \u57FA\u6E96\uFF09',
+        toastCleared: '\uD83D\uDDD1\uFE0F \u30AF\u30EA\u30A2\u3057\u307E\u3057\u305F',
+        toastNoContent: '\u30B3\u30D4\u30FC\u3059\u308B\u5185\u5BB9\u304C\u3042\u308A\u307E\u305B\u3093',
+        toastCopied: '\uD83D\uDCCB \u30AF\u30EA\u30C3\u30D7\u30DC\u30FC\u30C9\u306B\u30B3\u30D4\u30FC\u3057\u307E\u3057\u305F',
+        toastCopyFailed: '\u274C \u30B3\u30D4\u30FC\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u624B\u52D5\u3067\u30B3\u30D4\u30FC\u3057\u3066\u304F\u3060\u3055\u3044',
+        toastPasted: '\uD83D\uDCE5 {n} \u6587\u5B57\u3092\u8CBC\u308A\u4ED8\u3051\u307E\u3057\u305F',
+        toastClipboardEmpty: '\u30AF\u30EA\u30C3\u30D7\u30DC\u30FC\u30C9\u306F\u7A7A\u3067\u3059',
+        toastClipboardDenied: '\u274C \u30AF\u30EA\u30C3\u30D7\u30DC\u30FC\u30C9\u3092\u8AAD\u307F\u53D6\u308C\u307E\u305B\u3093\u3002Ctrl+V \u3092\u4F7F\u7528\u3057\u3066\u304F\u3060\u3055\u3044',
+        toastClipboardFallback: 'Ctrl+V \u3067\u8CBC\u308A\u4ED8\u3051\u3066\u304F\u3060\u3055\u3044',
+    },
+    ko: {
+        pageTitle: '\uAE00\uC790 \uC218 \uC138\uAE30',
+        siteName: '\uD558\uC774\uB8E8 \uB3C4\uAD6C\uC0C1\uC790',
+        navHome: '\uD648',
+        navCounter: '\uAE00\uC790 \uC218 \uC138\uAE30',
+        breadHome: '\uD648',
+        breadCounter: '\uAE00\uC790 \uC218 \uC138\uAE30',
+        toolDesc: '\uAE00\uC790, \uB2E8\uC5B4, \uBB38\uC7A5, \uBB38\uB2E8, \uC904 \uC218\uB97C \uC2E4\uC2DC\uAC04\uC73C\uB85C \uACC4\uC0B0\uD569\uB2C8\uB2E4. \uC911\uBB38/\uC601\uBB38 \uD63C\uD569 \uD14D\uC2A4\uD2B8\uB97C \uC9C0\uC6D0\uD569\uB2C8\uB2E4.',
+        labelChars: '\uAE00\uC790 \uC218',
+        labelCharsWith: '\uACF5\uBC31 \uD3EC\uD568',
+        labelCharsNoSpace: '\uAE00\uC790 \uC218',
+        labelCharsWithout: '\uACF5\uBC31 \uC81C\uC678',
+        labelWords: '\uB2E8\uC5B4 \uC218',
+        labelWordsSub: '\uB2E8\uC5B4',
+        labelSentences: '\uBB38\uC7A5 \uC218',
+        labelSentencesSub: '\uBB38\uC7A5',
+        labelParagraphs: '\uBB38\uB2E8 \uC218',
+        labelParagraphsSub: '\uBB38\uB2E8',
+        labelLines: '\uC904 \uC218',
+        labelLinesSub: '\uC904',
+        readingTimeLabel: '\uC57D {time} \uC77D\uAE30 \uC2DC\uAC04',
+        readingDetail: '{wpm} \uB2E8\uC5B4/\uBD84 \uAE30\uC900',
+        btnClear: '\uC9C0\uC6B0\uAE30',
+        btnCopy: '\uBCF5\uC0AC',
+        btnPaste: '\uBD99\uC5EC\uB123\uAE30',
+        freqHeading: '\uD83C\uDFC6 \uC790\uC8FC \uC0AC\uC6A9\uB41C \uB2E8\uC5B4',
+        freqEmpty: '\uD14D\uC2A4\uD2B8\uB97C \uC785\uB825\uD558\uBA74 \uC790\uC8FC \uC0AC\uC6A9\uB41C \uB2E8\uC5B4\uAC00 \uD45C\uC2DC\uB429\uB2C8\uB2E4',
+        hintPrivacy: '\uD83D\uDD12 \uBAA8\uB4E0 \uD1B5\uACC4\uB294 \uB85C\uCEEC\uC5D0\uC11C \uACC4\uC0B0\uB418\uBA70 \uD14D\uC2A4\uD2B8\uAC00 \uC11C\uBC84\uB85C \uC804\uC1A1\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4',
+        hintLang: '\uC911\uBB38/\uC601\uBB38 \uD63C\uD569 \uBD84\uC11D \uC9C0\uC6D0',
+        footerCopyright: '\u00A9 2026 \uD558\uC774\uB8E8 \uB3C4\uAD6C\uC0C1\uC790 \u00B7 \uB85C\uCEEC \uB3C4\uAD6C',
+        footerHome: '\uD648',
+        footerCounter: '\uAE00\uC790 \uC218 \uC138\uAE30',
+        placeholder: '\uC5EC\uAE30\uC5D0 \uD14D\uC2A4\uD2B8\uB97C \uC785\uB825\uD558\uAC70\uB098 \uBD99\uC5EC\uB123\uC73C\uBA74 \uC2E4\uC2DC\uAC04\uC73C\uB85C \uD1B5\uACC4\uAC00 \uC5C5\uB370\uC774\uD2B8\uB429\uB2C8\uB2E4\u2026',
+        charCount: '{n} \uAE00\uC790',
+        reading0: '0\uCD08',
+        readingSec: '{n}\uCD08',
+        readingMin: '{n}\uBD84',
+        readingMinSec: '{m}\uBD84 {s}\uCD08',
+        readingDetail0: '200\uB2E8\uC5B4/\uBD84 \uAE30\uC900',
+        readingDetailSec: '\uC57D {n}\uCD08 (200\uB2E8\uC5B4/\uBD84 \uAE30\uC900)',
+        readingDetailMin: '\uC57D {m}\uBD84{s} (200\uB2E8\uC5B4/\uBD84 \uAE30\uC900)',
+        toastCleared: '\uD83D\uDDD1\uFE0F \uC9C0\uC6CC\uC9D0',
+        toastNoContent: '\uBCF5\uC0AC\uD560 \uB0B4\uC6A9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4',
+        toastCopied: '\uD83D\uDCCB \uD074\uB9BD\uBCF4\uB4DC\uC5D0 \uBCF5\uC0AC\uB428',
+        toastCopyFailed: '\u274C \uBCF5\uC0AC \uC2E4\uD328, \uC218\uB3D9\uC73C\uB85C \uBCF5\uC0AC\uD574\uC8FC\uC138\uC694',
+        toastPasted: '\uD83D\uDCE5 {n}\uAE00\uC790 \uBD99\uC5EC\uB123\uC74C',
+        toastClipboardEmpty: '\uD074\uB9BD\uBCF4\uB4DC\uAC00 \uBE44\uC5B4 \uC788\uC2B5\uB2C8\uB2E4',
+        toastClipboardDenied: '\u274C \uD074\uB9BD\uBCF4\uB4DC\uB97C \uC77D\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4. Ctrl+V\uB97C \uC0AC\uC6A9\uD558\uC138\uC694',
+        toastClipboardFallback: 'Ctrl+V\uB97C \uC0AC\uC6A9\uD558\uC5EC \uBD99\uC5EC\uB123\uC73C\uC138\uC694',
+    },
+    fr: {
+        pageTitle: 'Compteur de texte',
+        siteName: 'Bo\u00EEte \u00E0 outils Hyrule',
+        navHome: 'Accueil',
+        navCounter: 'Compteur de texte',
+        breadHome: 'Accueil',
+        breadCounter: 'Compteur de texte',
+        toolDesc: 'Comptez caract\u00E8res, mots, phrases, paragraphes et lignes en temps r\u00E9el. Prend en charge les textes mixtes chinois/anglais.',
+        labelChars: 'Caract\u00E8res',
+        labelCharsWith: 'avec espaces',
+        labelCharsNoSpace: 'Caract\u00E8res',
+        labelCharsWithout: 'sans espaces',
+        labelWords: 'Mots',
+        labelWordsSub: 'mots',
+        labelSentences: 'Phrases',
+        labelSentencesSub: 'phrases',
+        labelParagraphs: 'Paragraphes',
+        labelParagraphsSub: 'paragraphes',
+        labelLines: 'Lignes',
+        labelLinesSub: 'lignes',
+        readingTimeLabel: 'Environ {time} de lecture',
+        readingDetail: 'Bas\u00E9 sur {wpm} mots/min',
+        btnClear: 'Effacer',
+        btnCopy: 'Copier',
+        btnPaste: 'Coller',
+        freqHeading: '\uD83C\uDFC6 Mots fr\u00E9quents',
+        freqEmpty: 'Saisissez du texte pour voir les mots fr\u00E9quents',
+        hintPrivacy: '\uD83D\uDD12 Toutes les statistiques sont calcul\u00E9es localement, le texte ne quitte jamais votre appareil',
+        hintLang: 'Prend en charge l\'analyse mixte chinois/anglais',
+        footerCopyright: '\u00A9 2026 Bo\u00EEte \u00E0 outils Hyrule \u00B7 Outils locaux',
+        footerHome: 'Accueil',
+        footerCounter: 'Compteur de texte',
+        placeholder: 'Tapez ou collez du texte ici, les statistiques se mettent \u00E0 jour en temps r\u00E9el\u2026',
+        charCount: '{n} caract\u00E8res',
+        reading0: '0 s',
+        readingSec: '{n} s',
+        readingMin: '{n} min',
+        readingMinSec: '{m} min {s} s',
+        readingDetail0: 'Bas\u00E9 sur 200 mots/min',
+        readingDetailSec: 'Environ {n} s (bas\u00E9 sur 200 mots/min)',
+        readingDetailMin: 'Environ {m} min{s} (bas\u00E9 sur 200 mots/min)',
+        toastCleared: '\uD83D\uDDD1\uFE0F Effac\u00E9',
+        toastNoContent: 'Rien \u00E0 copier',
+        toastCopied: '\uD83D\uDCCB Copi\u00E9 dans le presse-papiers',
+        toastCopyFailed: '\u274C \u00C9chec de la copie, veuillez copier manuellement',
+        toastPasted: '\uD83D\uDCE5 {n} caract\u00E8res coll\u00E9s',
+        toastClipboardEmpty: 'Le presse-papiers est vide',
+        toastClipboardDenied: '\u274C Impossible de lire le presse-papiers, utilisez Ctrl+V',
+        toastClipboardFallback: 'Utilisez Ctrl+V pour coller',
+    },
+    de: {
+        pageTitle: 'Textz\u00E4hler',
+        siteName: 'Hyrule-Werkzeugkasten',
+        navHome: 'Startseite',
+        navCounter: 'Textz\u00E4hler',
+        breadHome: 'Startseite',
+        breadCounter: 'Textz\u00E4hler',
+        toolDesc: 'Z\u00E4hlen Sie Zeichen, W\u00F6rter, S\u00E4tze, Abs\u00E4tze und Zeilen in Echtzeit. Unterst\u00FCtzt gemischte chinesische/englische Texte.',
+        labelChars: 'Zeichen',
+        labelCharsWith: 'mit Leerzeichen',
+        labelCharsNoSpace: 'Zeichen',
+        labelCharsWithout: 'ohne Leerzeichen',
+        labelWords: 'W\u00F6rter',
+        labelWordsSub: 'W\u00F6rter',
+        labelSentences: 'S\u00E4tze',
+        labelSentencesSub: 'S\u00E4tze',
+        labelParagraphs: 'Abs\u00E4tze',
+        labelParagraphsSub: 'Abs\u00E4tze',
+        labelLines: 'Zeilen',
+        labelLinesSub: 'Zeilen',
+        readingTimeLabel: 'Ca. {time} Lesezeit',
+        readingDetail: 'Basiert auf {wpm} W\u00F6rtern/min',
+        btnClear: 'L\u00F6schen',
+        btnCopy: 'Kopieren',
+        btnPaste: 'Einf\u00FCgen',
+        freqHeading: '\uD83C\uDFC6 H\u00E4ufige W\u00F6rter',
+        freqEmpty: 'Geben Sie Text ein, um h\u00E4ufige W\u00F6rter zu sehen',
+        hintPrivacy: '\uD83D\uDD12 Alle Statistiken werden lokal berechnet, Text verl\u00E4sst nie Ihr Ger\u00E4t',
+        hintLang: 'Unterst\u00FCtzt gemischte chinesische/englische Analyse',
+        footerCopyright: '\u00A9 2026 Hyrule-Werkzeugkasten \u00B7 Lokale Werkzeuge',
+        footerHome: 'Startseite',
+        footerCounter: 'Textz\u00E4hler',
+        placeholder: 'Geben Sie hier Text ein oder f\u00FCgen Sie ihn ein, die Statistiken werden in Echtzeit aktualisiert\u2026',
+        charCount: '{n} Zeichen',
+        reading0: '0 Sek.',
+        readingSec: '{n} Sek.',
+        readingMin: '{n} Min.',
+        readingMinSec: '{m} Min. {s} Sek.',
+        readingDetail0: 'Basiert auf 200 W\u00F6rtern/min',
+        readingDetailSec: 'Ca. {n} Sek. (basiert auf 200 W\u00F6rtern/min)',
+        readingDetailMin: 'Ca. {m} Min.{s} (basiert auf 200 W\u00F6rtern/min)',
+        toastCleared: '\uD83D\uDDD1\uFE0F Gel\u00F6scht',
+        toastNoContent: 'Nichts zu kopieren',
+        toastCopied: '\uD83D\uDCCB In die Zwischenablage kopiert',
+        toastCopyFailed: '\u274C Kopieren fehlgeschlagen, bitte manuell kopieren',
+        toastPasted: '\uD83D\uDCE5 {n} Zeichen eingef\u00FCgt',
+        toastClipboardEmpty: 'Zwischenablage ist leer',
+        toastClipboardDenied: '\u274C Kann Zwischenablage nicht lesen, verwenden Sie Strg+V',
+        toastClipboardFallback: 'Verwenden Sie Strg+V zum Einf\u00FCgen',
+    }
+};
+
 (function() {
     'use strict';
+
+    // ===== CURRENT LANGUAGE =====
+    var currentLang = localStorage.getItem('textCounterLang') || 'en';
+
+    // ===== I18N HELPERS =====
+    function t(key, params) {
+        var dict = I18N[currentLang] || I18N['en'];
+        var val = dict[key] || I18N['en'][key] || key;
+        if (params) {
+            for (var k in params) {
+                if (params.hasOwnProperty(k)) {
+                    val = val.replace('{' + k + '}', params[k]);
+                }
+            }
+        }
+        return val;
+    }
+
+    function _s(key) {
+        return (I18N[currentLang] || I18N['en'])[key] || (I18N['en'][key] || '');
+    }
 
     // ===== DOM REFS =====
     const textInput       = document.getElementById('textInput');
@@ -420,6 +799,8 @@
     const copyBtn         = document.getElementById('copyBtn');
     const pasteBtn        = document.getElementById('pasteBtn');
     const toast           = document.getElementById('toast');
+    const langSwitcher    = document.getElementById('langSwitcher');
+    const themeToggle     = document.getElementById('themeToggle');
 
     const statChars       = document.getElementById('statChars');
     const statCharsNoSpace= document.getElementById('statCharsNoSpace');
@@ -434,6 +815,90 @@
 
     // ===== STATE =====
     let debounceTimer = null;
+
+    // ===== THEME =====
+    var currentTheme = localStorage.getItem('textCounterTheme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (themeToggle) {
+        themeToggle.textContent = currentTheme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    }
+
+    // ===== APPLY LANGUAGE =====
+    function applyLanguage() {
+        var lang = currentLang;
+        var dict = I18N[lang] || I18N['en'];
+
+        // Set lang attribute
+        var htmlLang = 'en';
+        if (lang === 'zh') htmlLang = 'zh-CN';
+        else if (lang === 'ja') htmlLang = 'ja';
+        else if (lang === 'ko') htmlLang = 'ko';
+        else if (lang === 'fr') htmlLang = 'fr';
+        else if (lang === 'de') htmlLang = 'de';
+        document.documentElement.lang = htmlLang;
+
+        // Update page title
+        document.title = dict.pageTitle + ' \u2014 ' + dict.siteName;
+
+        // Helper to set text content by id
+        function setText(id, val) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        // Header / Nav
+        setText('siteName', dict.siteName);
+        setText('navHome', dict.navHome);
+        setText('navCounter', dict.navCounter);
+
+        // Breadcrumb
+        setText('breadHome', dict.breadHome);
+        setText('breadCounter', dict.breadCounter);
+
+        // Page title & description
+        setText('pageTitle', dict.pageTitle);
+        setText('toolDesc', dict.toolDesc);
+
+        // Textarea placeholder
+        textInput.placeholder = dict.placeholder;
+
+        // Stats labels
+        setText('labelChars', dict.labelChars);
+        setText('labelCharsWith', dict.labelCharsWith);
+        setText('labelCharsNoSpace', dict.labelCharsNoSpace);
+        setText('labelCharsWithout', dict.labelCharsWithout);
+        setText('labelWords', dict.labelWords);
+        setText('labelWordsSub', dict.labelWordsSub);
+        setText('labelSentences', dict.labelSentences);
+        setText('labelSentencesSub', dict.labelSentencesSub);
+        setText('labelParagraphs', dict.labelParagraphs);
+        setText('labelParagraphsSub', dict.labelParagraphsSub);
+        setText('labelLines', dict.labelLines);
+        setText('labelLinesSub', dict.labelLinesSub);
+
+        // Action buttons
+        setText('btnClear', dict.btnClear);
+        setText('btnCopy', dict.btnCopy);
+        setText('btnPaste', dict.btnPaste);
+
+        // Word frequency
+        setText('freqHeading', dict.freqHeading);
+        // Don't reset freqEmpty if frequency list is already populated
+        var fe = document.getElementById('freqEmpty');
+        if (fe) fe.textContent = dict.freqEmpty;
+
+        // Hints
+        setText('hintPrivacy', dict.hintPrivacy);
+        setText('hintLang', dict.hintLang);
+
+        // Footer
+        setText('footerCopyright', dict.footerCopyright);
+        setText('footerHome', dict.footerHome);
+        setText('footerCounter', dict.footerCounter);
+
+        // Re-render dynamic content
+        updateStats(textInput.value);
+    }
 
     // ===== STOP WORDS (common English + Chinese) =====
     const STOP_WORDS = new Set([
@@ -513,7 +978,7 @@
         }
 
         const chars = text.length;
-        const charsNoSpace = text.replace(/[\s]/g, '').length;
+        const charsNoSpace = text.replace(/\s/g, '').length;
         const lines = text.split('\n').length;
 
         // Words: split by whitespace and filter empty
@@ -536,17 +1001,25 @@
     }
 
     function getReadingTime(words) {
-        if (words === 0) return { text: '0 秒', detail: '基于 200 词/分钟' };
+        if (words === 0) {
+            return { text: t('reading0'), detail: t('readingDetail', { wpm: 200 }) };
+        }
         const minutes = words / 200;
         if (minutes < 1) {
             const seconds = Math.ceil(minutes * 60);
-            return { text: seconds + ' 秒', detail: '约 ' + seconds + ' 秒（基于 200 词/分钟）' };
+            return { text: t('readingSec', { n: seconds }), detail: t('readingDetailSec', { n: seconds }) };
         }
         const mins = Math.floor(minutes);
         const secs = Math.round((minutes - mins) * 60);
-        let text = mins + ' 分';
-        if (secs > 0) text += ' ' + secs + ' 秒';
-        return { text: text, detail: '约 ' + mins + ' 分' + (secs > 0 ? ' ' + secs + ' 秒' : '') + '（基于 200 词/分钟）' };
+        var text, detail;
+        if (secs > 0) {
+            text = t('readingMinSec', { m: mins, s: secs });
+            detail = t('readingDetailMin', { m: mins, s: ' ' + secs + '\u79D2' });
+        } else {
+            text = t('readingMin', { n: mins });
+            detail = t('readingDetailMin', { m: mins, s: '' });
+        }
+        return { text: text, detail: detail };
     }
 
     function getTopWords(text, count) {
@@ -579,7 +1052,7 @@
 
     function renderFreq(words) {
         if (words.length === 0) {
-            freqList.innerHTML = '<span class="freq-empty">输入文本后将显示高频词汇</span>';
+            freqList.innerHTML = '<span class="freq-empty" id="freqEmpty">' + _s('freqEmpty') + '</span>';
             return;
         }
         var html = '';
@@ -611,16 +1084,15 @@
     function updateStats(text) {
         var stats = getTextStats(text);
 
-        var changed = [];
-        if (statChars.textContent !== String(stats.chars)) { statChars.textContent = stats.chars; changed.push('chars'); }
-        if (statCharsNoSpace.textContent !== String(stats.charsNoSpace)) { statCharsNoSpace.textContent = stats.charsNoSpace; changed.push('charsNoSpace'); }
-        if (statWords.textContent !== String(stats.words)) { statWords.textContent = stats.words; changed.push('words'); }
-        if (statSentences.textContent !== String(stats.sentences)) { statSentences.textContent = stats.sentences; changed.push('sentences'); }
-        if (statParagraphs.textContent !== String(stats.paragraphs)) { statParagraphs.textContent = stats.paragraphs; changed.push('paragraphs'); }
-        if (statLines.textContent !== String(stats.lines)) { statLines.textContent = stats.lines; changed.push('lines'); }
+        if (statChars.textContent !== String(stats.chars)) { statChars.textContent = stats.chars; }
+        if (statCharsNoSpace.textContent !== String(stats.charsNoSpace)) { statCharsNoSpace.textContent = stats.charsNoSpace; }
+        if (statWords.textContent !== String(stats.words)) { statWords.textContent = stats.words; }
+        if (statSentences.textContent !== String(stats.sentences)) { statSentences.textContent = stats.sentences; }
+        if (statParagraphs.textContent !== String(stats.paragraphs)) { statParagraphs.textContent = stats.paragraphs; }
+        if (statLines.textContent !== String(stats.lines)) { statLines.textContent = stats.lines; }
 
         // Char count label
-        charCountLabel.textContent = stats.chars + ' 字符';
+        charCountLabel.textContent = t('charCount', { n: stats.chars });
 
         // Reading time
         var rt = getReadingTime(stats.words);
@@ -635,6 +1107,27 @@
         }, 300);
     }
 
+    // ===== LANGUAGE SWITCHER =====
+    if (langSwitcher) {
+        langSwitcher.value = currentLang;
+        langSwitcher.addEventListener('change', function() {
+            currentLang = langSwitcher.value;
+            localStorage.setItem('textCounterLang', currentLang);
+            applyLanguage();
+        });
+    }
+
+    // ===== THEME TOGGLE =====
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            var newTheme = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('textCounterTheme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+        });
+    }
+
     // ===== EVENT BINDING =====
 
     // Input event with debounce for stats
@@ -645,7 +1138,7 @@
             updateStats(textInput.value);
         }, 50);
         // Immediate char count label update
-        charCountLabel.textContent = textInput.value.length + ' 字符';
+        charCountLabel.textContent = t('charCount', { n: textInput.value.length });
     });
 
     // Initial stats update
@@ -656,19 +1149,19 @@
         textInput.value = '';
         textInput.focus();
         updateStats('');
-        showToast('🗑️ 已清空');
+        showToast(t('toastCleared'));
     });
 
     // Copy button
     copyBtn.addEventListener('click', function() {
         var text = textInput.value;
         if (!text) {
-            showToast('没有可复制的内容');
+            showToast(t('toastNoContent'));
             return;
         }
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(function() {
-                showToast('📋 已复制到剪贴板');
+                showToast(t('toastCopied'));
             }).catch(function() {
                 fallbackCopy(text);
             });
@@ -686,9 +1179,9 @@
         textarea.select();
         try {
             document.execCommand('copy');
-            showToast('📋 已复制到剪贴板');
+            showToast(t('toastCopied'));
         } catch (e) {
-            showToast('❌ 复制失败，请手动复制');
+            showToast(t('toastCopyFailed'));
         }
         document.body.removeChild(textarea);
     }
@@ -700,15 +1193,15 @@
                 if (text) {
                     textInput.value = text;
                     updateStats(text);
-                    showToast('📥 已粘贴 ' + text.length + ' 个字符');
+                    showToast(t('toastPasted', { n: text.length }));
                 } else {
-                    showToast('剪贴板为空');
+                    showToast(t('toastClipboardEmpty'));
                 }
             }).catch(function() {
-                showToast('❌ 无法读取剪贴板，请使用 Ctrl+V 粘贴');
+                showToast(t('toastClipboardDenied'));
             });
         } else {
-            showToast('请使用 Ctrl+V 粘贴');
+            showToast(t('toastClipboardFallback'));
         }
     });
 
@@ -719,9 +1212,12 @@
             e.preventDefault();
             textInput.value = '';
             updateStats('');
-            showToast('🗑️ 已清空');
+            showToast(t('toastCleared'));
         }
     });
+
+    // Apply initial language
+    applyLanguage();
 
 })();
 </script>
