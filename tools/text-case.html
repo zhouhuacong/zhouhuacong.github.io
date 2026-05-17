@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大小写转换 — 海拉鲁工具箱</title>
+    <link rel="stylesheet" href="css/tools.css">
+    <style>
+        /* ===== TEXT CASE CONVERTER SPECIFIC ===== */
+
+        .case-input-area {
+            position: relative;
+        }
+
+        .case-input-area textarea {
+            width: 100%;
+            min-height: 160px;
+            padding: 14px 16px;
+            padding-bottom: 36px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color-strong);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.7;
+            outline: none;
+            resize: vertical;
+            transition: all var(--transition-fast);
+        }
+
+        .case-input-area textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .case-input-area textarea::placeholder {
+            color: var(--text-placeholder);
+            font-family: var(--font-sans);
+        }
+
+        .case-input-area .char-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 14px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-tertiary);
+            background: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            pointer-events: none;
+            transition: color var(--transition-fast);
+        }
+
+        .case-input-area .char-badge.has-text {
+            color: var(--text-secondary);
+        }
+
+        /* Case buttons grid */
+        .case-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 600px) {
+            .case-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .case-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .case-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 14px 10px;
+            border: 1px solid var(--border-color-strong);
+            border-radius: var(--radius-md);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: -0.2px;
+        }
+
+        .case-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .case-btn:active {
+            transform: scale(0.96);
+        }
+
+        .case-btn .case-preview {
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--text-tertiary);
+            font-family: var(--font-sans);
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .case-btn:hover .case-preview {
+            color: var(--accent);
+            opacity: 0.7;
+        }
+
+        .case-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0px 2px 8px rgba(59,130,246,0.3);
+        }
+
+        .case-btn.active .case-preview {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Output area */
+        .output-wrap {
+            position: relative;
+            margin-top: 4px;
+        }
+
+        .output-display {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color-strong);
+            border-radius: var(--radius-md);
+            min-height: 56px;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.6;
+            word-break: break-all;
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .output-display .output-text {
+            flex: 1;
+            user-select: all;
+            cursor: text;
+            white-space: pre-wrap;
+        }
+
+        .output-display .output-text.placeholder {
+            color: var(--text-placeholder);
+            font-family: var(--font-sans);
+            font-size: 13px;
+        }
+
+        .output-display .output-copy-btn {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color-strong);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all var(--transition-fast);
+        }
+
+        .output-display .output-copy-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+            border-color: var(--text-tertiary);
+        }
+
+        .output-display .output-copy-btn:active {
+            transform: scale(0.92);
+        }
+
+        .output-display .output-copy-btn.copied {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        /* Character counts row */
+        .char-counts {
+            display: flex;
+            gap: 24px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .char-count-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .char-count-item .count-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 20px;
+            text-align: right;
+        }
+
+        .char-count-item .count-label {
+            font-weight: 400;
+        }
+
+        /* Active case indicator */
+        .active-case-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            transition: all var(--transition-fast);
+        }
+
+        .active-case-badge.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Clear / reset row */
+        .tool-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .tool-actions .btn-sm {
+            font-size: 12px;
+            padding: 5px 12px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="/" class="header-logo">
+            <span class="logo-icon">🔤</span>
+            <span>海拉鲁工具箱</span>
+        </a>
+        <nav class="header-nav">
+            <a href="/">首页</a>
+            <a href="text-case.html" class="active">大小写转换</a>
+        </nav>
+        <button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+    </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main>
+    <div class="container">
+        <section class="tool-section">
+            <!-- Breadcrumb -->
+            <div class="tool-header">
+                <div class="breadcrumb">
+                    <a href="/">首页</a>
+                    <span>›</span>
+                    <span>大小写转换</span>
+                </div>
+                <h1>🔤 大小写转换</h1>
+                <p>将文本快速转换为各种大小写格式 — 大写、小写、标题、驼峰、蛇形等，实时预览并一键复制。</p>
+            </div>
+
+            <!-- Tool Card -->
+            <div class="tool-card-container">
+                <div class="tool-body">
+
+                    <!-- Active case badge -->
+                    <div class="active-case-badge hidden" id="activeBadge">
+                        <span>🔠</span>
+                        <span id="activeCaseName">大写</span>
+                    </div>
+
+                    <!-- Textarea Input -->
+                    <div class="case-input-area">
+                        <textarea id="inputText" placeholder="在此输入文本…&#10;例如: hello world 2024" spellcheck="false"></textarea>
+                        <span class="char-badge" id="inputCharBadge">0 字符</span>
+                    </div>
+
+                    <!-- Tool actions -->
+                    <div class="tool-actions">
+                        <button class="btn btn-sm btn-ghost" id="clearBtn" title="清空输入">✕ 清空</button>
+                        <button class="btn btn-sm btn-ghost" id="pasteBtn" title="粘贴剪贴板">📋 粘贴</button>
+                    </div>
+
+                    <!-- Case Buttons Grid -->
+                    <div class="case-buttons" id="caseButtons">
+                        <button class="case-btn" data-case="upper" data-preview="HELLO WORLD">
+                            <span>UPPER</span>
+                            <span class="case-preview">HELLO</span>
+                        </button>
+                        <button class="case-btn" data-case="lower" data-preview="hello world">
+                            <span>lower</span>
+                            <span class="case-preview">hello</span>
+                        </button>
+                        <button class="case-btn" data-case="title" data-preview="Hello World">
+                            <span>Title</span>
+                            <span class="case-preview">Hello</span>
+                        </button>
+                        <button class="case-btn" data-case="camel" data-preview="helloWorld">
+                            <span>camelCase</span>
+                            <span class="case-preview">helloWorld</span>
+                        </button>
+                        <button class="case-btn" data-case="snake" data-preview="hello_world">
+                            <span>snake_case</span>
+                            <span class="case-preview">hello_world</span>
+                        </button>
+                        <button class="case-btn" data-case="pascal" data-preview="HelloWorld">
+                            <span>PascalCase</span>
+                            <span class="case-preview">HelloWorld</span>
+                        </button>
+                        <button class="case-btn" data-case="kebab" data-preview="hello-world">
+                            <span>kebab-case</span>
+                            <span class="case-preview">hello-world</span>
+                        </button>
+                        <button class="case-btn" data-case="toggle" data-preview="hELLO wORLD">
+                            <span>Toggle Case</span>
+                            <span class="case-preview">hELLO</span>
+                        </button>
+                    </div>
+
+                    <!-- Output Display -->
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label>输出结果</label>
+                    </div>
+                    <div class="output-wrap">
+                        <div class="output-display" id="outputDisplay">
+                            <span class="output-text placeholder" id="outputText">转换后的结果将显示在这里</span>
+                            <button class="output-copy-btn" id="copyBtn" title="复制结果" aria-label="复制结果">
+                                <span>📋</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Character Counts -->
+                    <div class="char-counts">
+                        <div class="char-count-item">
+                            <span class="count-value" id="inputChars">0</span>
+                            <span class="count-label">输入字符</span>
+                        </div>
+                        <div class="char-count-item">
+                            <span class="count-value" id="inputWords">0</span>
+                            <span class="count-label">输入单词</span>
+                        </div>
+                        <div class="char-count-item">
+                            <span class="count-value" id="outputChars">0</span>
+                            <span class="count-label">输出字符</span>
+                        </div>
+                        <div class="char-count-item">
+                            <span class="count-value" id="outputLines">0</span>
+                            <span class="count-label">输出行数</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tool-footer">
+                    <span class="hint">💡 点击输出结果或复制按钮一键复制</span>
+                    <span class="hint">⚡ 实时转换，点击任意格式按钮即可</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <span>&copy; 2026 海拉鲁工具箱</span>
+        <span>
+            <a href="/">首页</a>
+            <span style="margin:0 6px;opacity:0.3;">·</span>
+            <span>大小写转换</span>
+        </span>
+    </div>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+    (function () {
+        'use strict';
+
+        /* ============================================================
+           DOM REFS
+           ============================================================ */
+
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const copyBtn = document.getElementById('copyBtn');
+        const caseButtons = document.querySelectorAll('.case-btn');
+        const activeBadge = document.getElementById('activeBadge');
+        const activeCaseName = document.getElementById('activeCaseName');
+        const inputCharBadge = document.getElementById('inputCharBadge');
+        const inputChars = document.getElementById('inputChars');
+        const inputWords = document.getElementById('inputWords');
+        const outputChars = document.getElementById('outputChars');
+        const outputLines = document.getElementById('outputLines');
+        const clearBtn = document.getElementById('clearBtn');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const toastEl = document.getElementById('toast');
+
+        let toastTimer = null;
+        let currentCase = null;
+
+        /* ============================================================
+           CASE CONVERSION FUNCTIONS
+           ============================================================ */
+
+        function toUpper(str) {
+            return str.toUpperCase();
+        }
+
+        function toLower(str) {
+            return str.toLowerCase();
+        }
+
+        function toTitle(str) {
+            return str.replace(/\w\S*/g, function (word) {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            });
+        }
+
+        function toCamelCase(str) {
+            const cleaned = str.replace(/[^a-zA-Z0-9]+/g, ' ').trim();
+            if (!cleaned) return '';
+            const words = cleaned.split(/\s+/);
+            return words[0].toLowerCase() + words.slice(1).map(function (w) {
+                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            }).join('');
+        }
+
+        function toSnakeCase(str) {
+            return str
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/[^a-zA-Z0-9]+/g, ' ')
+                .trim()
+                .split(/\s+/)
+                .join('_')
+                .toLowerCase();
+        }
+
+        function toPascalCase(str) {
+            const cleaned = str.replace(/[^a-zA-Z0-9]+/g, ' ').trim();
+            if (!cleaned) return '';
+            return cleaned.split(/\s+/).map(function (w) {
+                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            }).join('');
+        }
+
+        function toKebabCase(str) {
+            return str
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/[^a-zA-Z0-9]+/g, ' ')
+                .trim()
+                .split(/\s+/)
+                .join('-')
+                .toLowerCase();
+        }
+
+        function toToggleCase(str) {
+            return str.split('').map(function (ch) {
+                if (ch === ch.toUpperCase()) {
+                    return ch.toLowerCase();
+                } else if (ch === ch.toLowerCase()) {
+                    return ch.toUpperCase();
+                }
+                return ch;
+            }).join('');
+        }
+
+        const converterMap = {
+            upper: { fn: toUpper, label: '大写 (UPPER)' },
+            lower: { fn: toLower, label: '小写 (lower)' },
+            title: { fn: toTitle, label: '标题 (Title)' },
+            camel: { fn: toCamelCase, label: '驼峰 (camelCase)' },
+            snake: { fn: toSnakeCase, label: '蛇形 (snake_case)' },
+            pascal: { fn: toPascalCase, label: '帕斯卡 (PascalCase)' },
+            kebab: { fn: toKebabCase, label: '连字符 (kebab-case)' },
+            toggle: { fn: toToggleCase, label: '反转 (Toggle Case)' },
+        };
+
+        /* ============================================================
+           CONVERT & UPDATE
+           ============================================================ */
+
+        function updateCounts(input, output) {
+            const inStr = input || '';
+            const outStr = output || '';
+
+            // Input char badge
+            const inLen = inStr.length;
+            inputCharBadge.textContent = inLen + ' 字符';
+            inputCharBadge.classList.toggle('has-text', inLen > 0);
+
+            // Detailed counts
+            inputChars.textContent = inLen;
+            inputWords.textContent = inStr.trim() ? inStr.trim().split(/\s+/).length : 0;
+
+            outputChars.textContent = outStr.length;
+            outputLines.textContent = outStr ? outStr.split('\n').length : 0;
+        }
+
+        function convertAndDisplay() {
+            const input = inputText.value;
+
+            if (!input) {
+                outputText.textContent = '';
+                outputText.classList.add('placeholder');
+                outputText.textContent = '输入文本以开始转换';
+                activeBadge.classList.add('hidden');
+                copyBtn.textContent = '📋';
+                copyBtn.classList.remove('copied');
+                updateCounts(input, '');
+                return;
+            }
+
+            if (!currentCase) {
+                outputText.textContent = '';
+                outputText.classList.add('placeholder');
+                outputText.textContent = '请点击上方的一个格式按钮';
+                activeBadge.classList.add('hidden');
+                updateCounts(input, '');
+                return;
+            }
+
+            const converter = converterMap[currentCase];
+            if (!converter) return;
+
+            const result = converter.fn(input);
+
+            outputText.textContent = result;
+            outputText.classList.remove('placeholder');
+            activeCaseName.textContent = converter.label;
+            activeBadge.classList.remove('hidden');
+            copyBtn.textContent = '📋';
+            copyBtn.classList.remove('copied');
+
+            updateCounts(input, result);
+        }
+
+        /* ============================================================
+           EVENT HANDLERS
+           ============================================================ */
+
+        // Input text changes
+        inputText.addEventListener('input', convertAndDisplay);
+
+        // Case button clicks
+        caseButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const caseType = btn.dataset.case;
+
+                // Toggle off if already active
+                if (currentCase === caseType) {
+                    currentCase = null;
+                    btn.classList.remove('active');
+                } else {
+                    // Deactivate all
+                    caseButtons.forEach(function (b) { b.classList.remove('active'); });
+                    currentCase = caseType;
+                    btn.classList.add('active');
+                }
+
+                convertAndDisplay();
+            });
+        });
+
+        // Copy output
+        copyBtn.addEventListener('click', function () {
+            const text = outputText.textContent;
+            if (!text || outputText.classList.contains('placeholder')) {
+                showToast('没有可复制的内容');
+                return;
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function () {
+                    copyBtn.textContent = '✓';
+                    copyBtn.classList.add('copied');
+                    showToast('已复制到剪贴板');
+                    setTimeout(function () {
+                        copyBtn.textContent = '📋';
+                        copyBtn.classList.remove('copied');
+                    }, 1500);
+                }).catch(function () {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        });
+
+        // Click on output text to copy
+        outputText.addEventListener('click', function () {
+            if (!outputText.classList.contains('placeholder')) {
+                copyBtn.click();
+            }
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', function () {
+            inputText.value = '';
+            currentCase = null;
+            caseButtons.forEach(function (b) { b.classList.remove('active'); });
+            convertAndDisplay();
+            inputText.focus();
+        });
+
+        // Paste button
+        pasteBtn.addEventListener('click', function () {
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText().then(function (text) {
+                    inputText.value = text;
+                    convertAndDisplay();
+                }).catch(function () {
+                    showToast('无法读取剪贴板，请手动粘贴');
+                });
+            } else {
+                inputText.focus();
+                document.execCommand('paste');
+                // Small delay for paste to complete
+                setTimeout(convertAndDisplay, 50);
+            }
+        });
+
+        // Keyboard shortcut: Ctrl+Enter to copy
+        inputText.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                copyBtn.click();
+            }
+        });
+
+        /* ============================================================
+           FALLBACK COPY
+           ============================================================ */
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            ta.style.top = '-9999px';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            try {
+                const success = document.execCommand('copy');
+                if (success) {
+                    copyBtn.textContent = '✓';
+                    copyBtn.classList.add('copied');
+                    showToast('已复制到剪贴板');
+                    setTimeout(function () {
+                        copyBtn.textContent = '📋';
+                        copyBtn.classList.remove('copied');
+                    }, 1500);
+                } else {
+                    showToast('复制失败');
+                }
+            } catch (e) {
+                showToast('复制失败');
+            }
+            document.body.removeChild(ta);
+        }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+
+        function showToast(message) {
+            toastEl.textContent = message;
+            toastEl.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () {
+                toastEl.classList.remove('show');
+            }, 2000);
+        }
+
+        /* ============================================================
+           THEME TOGGLE (dark mode)
+           ============================================================ */
+
+        const themeToggle = document.getElementById('themeToggle');
+
+        function getPreferredTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.style.setProperty('--bg-primary', '#0a0a0b');
+                document.documentElement.style.setProperty('--bg-secondary', '#111113');
+                document.documentElement.style.setProperty('--bg-tertiary', '#18181b');
+                document.documentElement.style.setProperty('--bg-card', '#111113');
+                document.documentElement.style.setProperty('--bg-input', '#18181b');
+                document.documentElement.style.setProperty('--bg-hover', '#27272a');
+                document.documentElement.style.setProperty('--bg-toolbar', '#18181b');
+                document.documentElement.style.setProperty('--text-primary', '#fafafa');
+                document.documentElement.style.setProperty('--text-secondary', '#a1a1aa');
+                document.documentElement.style.setProperty('--text-tertiary', '#71717a');
+                document.documentElement.style.setProperty('--text-placeholder', '#52525b');
+                document.documentElement.style.setProperty('--text-inverse', '#0a0a0b');
+                document.documentElement.style.setProperty('--border-color', 'rgba(255,255,255,0.08)');
+                document.documentElement.style.setProperty('--border-color-strong', 'rgba(255,255,255,0.12)');
+                document.documentElement.style.setProperty('--shadow-sm', '0px 0px 0px 1px rgba(255,255,255,0.06), 0px 1px 2px rgba(0,0,0,0.2)');
+                document.documentElement.style.setProperty('--shadow-md', '0px 0px 0px 1px rgba(255,255,255,0.06), 0px 2px 4px rgba(0,0,0,0.2), 0px 8px 16px -8px rgba(0,0,0,0.3)');
+                document.documentElement.style.setProperty('--shadow-lg', '0px 0px 0px 1px rgba(255,255,255,0.06), 0px 4px 8px rgba(0,0,0,0.2), 0px 16px 24px -8px rgba(0,0,0,0.4)');
+                document.documentElement.style.setProperty('--accent', '#3b82f6');
+                document.documentElement.style.setProperty('--accent-hover', '#60a5fa');
+                document.documentElement.style.setProperty('--accent-light', 'rgba(59,130,246,0.1)');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.style.removeProperty('--bg-primary');
+                document.documentElement.style.removeProperty('--bg-secondary');
+                document.documentElement.style.removeProperty('--bg-tertiary');
+                document.documentElement.style.removeProperty('--bg-card');
+                document.documentElement.style.removeProperty('--bg-input');
+                document.documentElement.style.removeProperty('--bg-hover');
+                document.documentElement.style.removeProperty('--bg-toolbar');
+                document.documentElement.style.removeProperty('--text-primary');
+                document.documentElement.style.removeProperty('--text-secondary');
+                document.documentElement.style.removeProperty('--text-tertiary');
+                document.documentElement.style.removeProperty('--text-placeholder');
+                document.documentElement.style.removeProperty('--text-inverse');
+                document.documentElement.style.removeProperty('--border-color');
+                document.documentElement.style.removeProperty('--border-color-strong');
+                document.documentElement.style.removeProperty('--shadow-sm');
+                document.documentElement.style.removeProperty('--shadow-md');
+                document.documentElement.style.removeProperty('--shadow-lg');
+                document.documentElement.style.removeProperty('--accent');
+                document.documentElement.style.removeProperty('--accent-hover');
+                document.documentElement.style.removeProperty('--accent-light');
+                themeToggle.textContent = '🌙';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        // On load: check stored or system preference
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+            applyTheme(storedTheme);
+        } else {
+            applyTheme(getPreferredTheme());
+        }
+
+        themeToggle.addEventListener('click', function () {
+            const current = localStorage.getItem('theme') || getPreferredTheme();
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // Listen for system theme changes (if no stored preference)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        /* ============================================================
+           INIT
+           ============================================================ */
+
+        // Show initial placeholder
+        convertAndDisplay();
+
+    })();
+</script>
+
+</body>
+</html>

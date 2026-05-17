@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在线工具集 — zhczlx.com/tools</title>
+  <link rel="stylesheet" href="css/tools.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
+  <meta name="description" content="免费在线工具集：密码生成器、单位换算、文本统计、大小写转换、UUID生成器、颜色转换器。">
+  <style>
+    /* ===== ANIMATION STAGGER ===== */
+    .tool-card:nth-child(1) { animation-delay: 0.05s; }
+    .tool-card:nth-child(2) { animation-delay: 0.10s; }
+    .tool-card:nth-child(3) { animation-delay: 0.15s; }
+    .tool-card:nth-child(4) { animation-delay: 0.20s; }
+    .tool-card:nth-child(5) { animation-delay: 0.25s; }
+    .tool-card:nth-child(6) { animation-delay: 0.30s; }
+
+    /* ===== HERO SUBTITLE WITH ICONS ===== */
+    .hero-tags {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .hero-tags span {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+    }
+
+    /* ===== RESPONSIVE NAV ===== */
+    @media (max-width: 768px) {
+      .header-nav a span {
+        display: none;
+      }
+      .hero-tags span {
+        font-size: 11px;
+        padding: 3px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner {
+        padding: 0 16px;
+      }
+      .page-hero {
+        padding: 40px 0 24px;
+      }
+      .tool-grid {
+        padding-bottom: 40px;
+      }
+    }
+
+    /* ===== TAG VARIANTS ===== */
+    .tool-card .tag.hot {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .tool-card .tag.new {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .tool-card .tag.hot {
+        background: rgba(239, 68, 68, 0.15);
+      }
+      .tool-card .tag.new {
+        background: rgba(16, 185, 129, 0.15);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== STICKY HEADER ===== -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <span class="logo-icon">T</span>
+      <span>Tools</span>
+    </a>
+    <nav class="header-nav">
+      <a href="password-generator.html"><span>🔑</span> 密码生成器</a>
+      <a href="unit-converter.html"><span>📐</span> <span>单位换算</span></a>
+      <a href="text-counter.html"><span>📊</span> <span>文本统计</span></a>
+      <a href="text-case.html"><span>🔤</span> <span>大小写转换</span></a>
+      <a href="uuid-generator.html"><span>🆔</span> <span>UUID生成</span></a>
+      <a href="color-converter.html"><span>🎨</span> <span>颜色转换</span></a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌓</button>
+  </div>
+</header>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main>
+  <div class="container">
+    <!-- ===== HERO ===== -->
+    <section class="page-hero">
+      <h1><span class="gradient">🔧 在线工具集</span></h1>
+      <p>免费、高效、开箱即用的开发工具，全部在浏览器端运行，无需上传任何数据到服务器。</p>
+      <div class="hero-tags">
+        <span>⚡ 纯客户端</span>
+        <span>🔒 隐私安全</span>
+        <span>📱 移动适配</span>
+        <span>🌙 深色模式</span>
+      </div>
+    </section>
+
+    <!-- ===== TOOL GRID ===== -->
+    <div class="tool-grid">
+
+      <!-- Password Generator -->
+      <a href="password-generator.html" class="tool-card animate-in">
+        <div class="tool-card-icon">🔑</div>
+        <h3>密码生成器</h3>
+        <p>生成高强度随机密码，支持大小写、数字、符号组合，实时显示密码强度评级。</p>
+        <span class="tag hot">热门</span>
+      </a>
+
+      <!-- Unit Converter -->
+      <a href="unit-converter.html" class="tool-card animate-in">
+        <div class="tool-card-icon">📐</div>
+        <h3>单位换算</h3>
+        <p>支持长度、质量、温度、体积、面积、速度等多种单位之间的即时换算。</p>
+        <span class="tag">工具</span>
+      </a>
+
+      <!-- Text Counter -->
+      <a href="text-counter.html" class="tool-card animate-in">
+        <div class="tool-card-icon">📊</div>
+        <h3>文本统计</h3>
+        <p>实时统计字符数、单词数、行数、段落数，支持中文/英文混合文本分析。</p>
+        <span class="tag hot">热门</span>
+      </a>
+
+      <!-- Text Case -->
+      <a href="text-case.html" class="tool-card animate-in">
+        <div class="tool-card-icon">🔤</div>
+        <h3>大小写转换</h3>
+        <p>一键转换大写、小写、首字母大写、驼峰式、蛇形式、帕斯卡式等多种格式。</p>
+        <span class="tag new">新</span>
+      </a>
+
+      <!-- UUID Generator -->
+      <a href="uuid-generator.html" class="tool-card animate-in">
+        <div class="tool-card-icon">🆔</div>
+        <h3>UUID 生成器</h3>
+        <p>生成 UUID v4 随机标识符，支持批量生成、一键复制、大写/小写格式切换。</p>
+        <span class="tag">工具</span>
+      </a>
+
+      <!-- Color Converter -->
+      <a href="color-converter.html" class="tool-card animate-in">
+        <div class="tool-card-icon">🎨</div>
+        <h3>颜色转换器</h3>
+        <p>在 HEX、RGB、HSL、HSV 格式之间互转，带取色器、历史记录与实时预览。</p>
+        <span class="tag new">新</span>
+      </a>
+
+    </div>
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>&copy; 2026 <a href="https://zhczlx.com">zhczlx.com</a></span>
+    <nav style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="https://zhczlx.com">首页</a>
+      <a href="https://zhczlx.com/about">关于</a>
+      <a href="mailto:hi@zhczlx.com">联系</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function () {
+  'use strict';
+
+  // ----- Theme Toggle -----
+  const themeToggle = document.getElementById('themeToggle');
+  const htmlEl = document.documentElement;
+  const STORAGE_KEY = 'zhczlx-theme';
+
+  function getPreferredTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function getStoredTheme() {
+    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  }
+
+  function setStoredTheme(theme) {
+    try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) { /* noop */ }
+  }
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      htmlEl.style.colorScheme = 'dark';
+      // Force dark mode CSS variables by toggling a data attribute
+      htmlEl.setAttribute('data-theme', 'dark');
+      themeToggle.textContent = '☀️';
+    } else {
+      htmlEl.style.colorScheme = 'light';
+      htmlEl.removeAttribute('data-theme');
+      themeToggle.textContent = '🌓';
+    }
+  }
+
+  // Initialize theme
+  const stored = getStoredTheme();
+  const initialTheme = stored || getPreferredTheme();
+  applyTheme(initialTheme);
+
+  themeToggle.addEventListener('click', function () {
+    const current = htmlEl.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    setStoredTheme(next);
+  });
+
+  // Listen for system preference changes (if no stored theme)
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+    if (!getStoredTheme()) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+
+  // ----- Force dark mode CSS variables -----
+  // When data-theme="dark" is set, override the CSS variables via inline style
+  // since the CSS already has prefers-color-scheme media query.
+  // We need to override the media query. Let's add a style override dynamically.
+  const darkOverrideStyle = document.createElement('style');
+  darkOverrideStyle.textContent = `
+    html[data-theme="dark"] {
+      --bg-primary: #0a0a0b !important;
+      --bg-secondary: #111113 !important;
+      --bg-tertiary: #18181b !important;
+      --bg-card: #111113 !important;
+      --bg-input: #18181b !important;
+      --bg-hover: #27272a !important;
+      --bg-toolbar: #18181b !important;
+      --text-primary: #fafafa !important;
+      --text-secondary: #a1a1aa !important;
+      --text-tertiary: #71717a !important;
+      --text-placeholder: #52525b !important;
+      --text-inverse: #0a0a0b !important;
+      --border-color: rgba(255, 255, 255, 0.08) !important;
+      --border-color-strong: rgba(255, 255, 255, 0.12) !important;
+      --shadow-sm: 0px 0px 0px 1px rgba(255,255,255,0.06), 0px 1px 2px rgba(0,0,0,0.2) !important;
+      --shadow-md: 0px 0px 0px 1px rgba(255,255,255,0.06), 0px 2px 4px rgba(0,0,0,0.2), 0px 8px 16px -8px rgba(0,0,0,0.3) !important;
+      --shadow-lg: 0px 0px 0px 1px rgba(255,255,255,0.06), 0px 4px 8px rgba(0,0,0,0.2), 0px 16px 24px -8px rgba(0,0,0,0.4) !important;
+      --accent: #3b82f6 !important;
+      --accent-hover: #60a5fa !important;
+      --accent-light: rgba(59, 130, 246, 0.1) !important;
+    }
+  `;
+  document.head.appendChild(darkOverrideStyle);
+
+  // Apply dark if stored or preferred
+  if (initialTheme === 'dark') {
+    htmlEl.setAttribute('data-theme', 'dark');
+    htmlEl.style.colorScheme = 'dark';
+    themeToggle.textContent = '☀️';
+  }
+
+  // ----- Toast Notification System -----
+  const toastEl = document.getElementById('toast');
+  let toastTimeout = null;
+
+  window.showToast = function (message) {
+    if (!toastEl) return;
+    toastEl.textContent = message || '✅ 已复制到剪贴板';
+    toastEl.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function () {
+      toastEl.classList.remove('show');
+    }, 2000);
+  };
+
+  // ----- Copy-to-clipboard helper (for use on tool pages) -----
+  window.copyToClipboard = function (text, successMsg) {
+    if (!text && text !== '') return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        window.showToast(successMsg || '✅ 已复制到剪贴板');
+      }).catch(function () {
+        fallbackCopy(text, successMsg);
+      });
+    } else {
+      fallbackCopy(text, successMsg);
+    }
+  };
+
+  function fallbackCopy(text, successMsg) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      window.showToast(successMsg || '✅ 已复制到剪贴板');
+    } catch (e) {
+      window.showToast('❌ 复制失败，请手动复制');
+    }
+    document.body.removeChild(textarea);
+  }
+
+  // ----- Animate cards on intersection (progressive enhancement) -----
+  if ('IntersectionObserver' in window) {
+    var cards = document.querySelectorAll('.tool-card.animate-in');
+    if (cards.length) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      cards.forEach(function (card) {
+        // Pause animation initially so observer can start it
+        card.style.animationPlayState = 'paused';
+        observer.observe(card);
+      });
+      // Fallback: if observer doesn't trigger within 2s, start all
+      setTimeout(function () {
+        cards.forEach(function (card) {
+          card.style.animationPlayState = 'running';
+        });
+      }, 2000);
+    }
+  }
+
+})();
+</script>
+
+</body>
+</html>

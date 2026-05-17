@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID生成器 — 海拉鲁工具箱</title>
+    <link rel="stylesheet" href="css/tools.css">
+    <style>
+        /* ===== UUID GENERATOR SPECIFIC ===== */
+
+        /* Options row */
+        .options-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 560px) {
+            .options-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .options-row .input-group {
+            margin-bottom: 0;
+        }
+
+        /* Quantity slider row */
+        .qty-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .qty-slider-row input[type="range"] {
+            flex: 1;
+        }
+        .qty-slider-row .qty-value {
+            font-family: var(--font-mono);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 36px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Format toggle group */
+        .format-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .format-btn {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color-strong);
+            border-radius: var(--radius-md);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            user-select: none;
+        }
+        .format-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        .format-btn.active {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Generate button */
+        .generate-wrap {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .btn-generate {
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            color: white;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0px 4px 12px rgba(59,130,246,0.35);
+        }
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+        .btn-generate.generating {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+        .btn-generate .generate-icon {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .btn-generate.generating .generate-icon {
+            animation: spin-gen 0.6s ease-in-out;
+        }
+        @keyframes spin-gen {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.15); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.15); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Bulk copy row */
+        .bulk-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+            min-height: 36px;
+        }
+        .btn-bulk-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1px solid var(--border-color-strong);
+            border-radius: var(--radius-md);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .btn-bulk-copy:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+            border-color: var(--text-tertiary);
+        }
+        .btn-bulk-copy.copied {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        /* UUID result list */
+        .uuid-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 0;
+        }
+        .uuid-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-primary);
+            animation: fadeIn 0.3s ease both;
+            transition: border-color var(--transition-fast);
+        }
+        .uuid-item:hover {
+            border-color: var(--border-color-strong);
+        }
+        .uuid-item .uuid-text {
+            flex: 1;
+            word-break: break-all;
+            user-select: all;
+            cursor: text;
+            line-height: 1.5;
+        }
+        .uuid-item .uuid-copy-btn {
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .uuid-item .uuid-copy-btn:hover {
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+        .uuid-item .uuid-copy-btn:active {
+            transform: scale(0.9);
+        }
+        .uuid-item .uuid-copy-btn.copied {
+            color: var(--success);
+            background: rgba(16,185,129,0.1);
+        }
+
+        /* Version badge */
+        .uuid-item .uuid-version-badge {
+            flex-shrink: 0;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            background: var(--accent-light);
+            color: var(--accent);
+            font-family: var(--font-sans);
+            letter-spacing: 0;
+        }
+
+        /* Empty state */
+        .uuid-empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .uuid-empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 14px;
+            opacity: 0.5;
+        }
+        .uuid-empty-state h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .uuid-empty-state p {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        /* Stats row */
+        .uuid-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        .uuid-stat {
+            text-align: center;
+            padding: 10px 8px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+        .uuid-stat .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+        }
+        .uuid-stat .stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        @media (max-width: 480px) {
+            .uuid-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .uuid-stat .stat-value {
+                font-size: 15px;
+            }
+        }
+
+        /* Hidden textarea for bulk copy fallback */
+        .bulk-textarea {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="/" class="header-logo">
+            <span class="logo-icon">🔧</span>
+            <span>海拉鲁工具箱</span>
+        </a>
+        <nav class="header-nav">
+            <a href="/">首页</a>
+            <a href="uuid-generator.html" class="active">UUID生成器</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main>
+    <div class="container">
+        <div class="tool-section">
+
+            <!-- Breadcrumb -->
+            <div class="tool-header">
+                <div class="breadcrumb">
+                    <a href="/">首页</a>
+                    <span>›</span>
+                    <span>UUID生成器</span>
+                </div>
+                <h1>🔖 UUID生成器</h1>
+                <p>生成通用唯一识别码 (UUID)，支持 v1、v4、v7 版本，多种格式输出。</p>
+            </div>
+
+            <!-- Tool Card -->
+            <div class="tool-card-container">
+                <div class="tool-body">
+
+                    <!-- Options -->
+                    <div class="options-row">
+                        <!-- UUID Version -->
+                        <div class="input-group">
+                            <label>UUID 版本 <span class="label-hint">(v4 推荐)</span></label>
+                            <select id="versionSelect">
+                                <option value="v4">v4 — 随机 (Random)</option>
+                                <option value="v1">v1 — 时间 (Time-based)</option>
+                                <option value="v7">v7 — 时间排序 (Time-ordered)</option>
+                            </select>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="input-group">
+                            <label>生成数量 <span class="label-hint">(1–20)</span></label>
+                            <div class="qty-slider-row">
+                                <input type="range" id="qtySlider" min="1" max="20" value="5">
+                                <span class="qty-value" id="qtyDisplay">5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Format -->
+                    <div class="input-group">
+                        <label>输出格式</label>
+                        <div class="format-group" id="formatGroup">
+                            <button class="format-btn active" data-format="lowercase">小写</button>
+                            <button class="format-btn" data-format="uppercase">大写</button>
+                            <button class="format-btn" data-format="no-hyphens">无连字符</button>
+                            <button class="format-btn" data-format="braces">带花括号</button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="generate-wrap">
+                        <button class="btn-generate" id="generateBtn">
+                            <span class="generate-icon">🎲</span>
+                            <span>生成 UUID</span>
+                        </button>
+                    </div>
+
+                    <!-- Results Area -->
+                    <div id="resultsArea">
+                        <!-- Empty state (shown before first generation) -->
+                        <div class="uuid-empty-state" id="emptyState">
+                            <div class="empty-icon">🔖</div>
+                            <h3>等待生成</h3>
+                            <p>选择版本和数量，点击上方按钮生成 UUID</p>
+                        </div>
+
+                        <!-- Results (hidden initially) -->
+                        <div id="resultsContent" style="display:none;">
+                            <!-- Bulk copy row -->
+                            <div class="bulk-row">
+                                <button class="btn-bulk-copy" id="bulkCopyBtn">📋 批量复制</button>
+                            </div>
+
+                            <!-- UUID list -->
+                            <div class="uuid-list" id="uuidList"></div>
+
+                            <!-- Stats -->
+                            <div class="uuid-stats" id="uuidStats">
+                                <div class="uuid-stat">
+                                    <div class="stat-value" id="statCount">0</div>
+                                    <div class="stat-label">生成数量</div>
+                                </div>
+                                <div class="uuid-stat">
+                                    <div class="stat-value" id="statVersion">—</div>
+                                    <div class="stat-label">UUID 版本</div>
+                                </div>
+                                <div class="uuid-stat">
+                                    <div class="stat-value" id="statFormat">—</div>
+                                    <div class="stat-label">输出格式</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Footer hints -->
+                <div class="tool-footer">
+                    <span class="hint">🔒 所有 UUID 均在本地生成，不会发送到服务器</span>
+                    <span class="hint">点击 UUID 可全选，点击 📋 复制单个</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <span>© 2026 海拉鲁工具箱 · 本地工具集</span>
+        <span>
+            <a href="/">首页</a>
+            <span style="margin:0 6px;opacity:0.3;">·</span>
+            <span>UUID生成器</span>
+        </span>
+    </div>
+</footer>
+
+<!-- Hidden textarea for bulk copy fallback -->
+<textarea class="bulk-textarea" id="bulkTextarea"></textarea>
+
+<script>
+(function() {
+    'use strict';
+
+    // ===== DOM REFS =====
+    const versionSelect = document.getElementById('versionSelect');
+    const qtySlider     = document.getElementById('qtySlider');
+    const qtyDisplay    = document.getElementById('qtyDisplay');
+    const formatGroup   = document.getElementById('formatGroup');
+    const generateBtn   = document.getElementById('generateBtn');
+    const emptyState    = document.getElementById('emptyState');
+    const resultsContent = document.getElementById('resultsContent');
+    const uuidList      = document.getElementById('uuidList');
+    const bulkCopyBtn   = document.getElementById('bulkCopyBtn');
+    const bulkTextarea  = document.getElementById('bulkTextarea');
+    const toast         = document.getElementById('toast');
+
+    const statCount    = document.getElementById('statCount');
+    const statVersion  = document.getElementById('statVersion');
+    const statFormat   = document.getElementById('statFormat');
+
+    // ===== STATE =====
+    let currentUUIDs = [];
+    let currentFormat = 'lowercase';
+
+    // ===== HELPERS =====
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    function copyToClipboard(text, btnEl) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (btnEl) {
+                    btnEl.classList.add('copied');
+                    setTimeout(() => btnEl.classList.remove('copied'), 1200);
+                }
+                showToast('已复制!');
+            }).catch(() => {
+                fallbackCopy(text, btnEl);
+            });
+        } else {
+            fallbackCopy(text, btnEl);
+        }
+    }
+
+    function fallbackCopy(text, btnEl) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            if (btnEl) {
+                btnEl.classList.add('copied');
+                setTimeout(() => btnEl.classList.remove('copied'), 1200);
+            }
+            showToast('已复制!');
+        } catch (e) {
+            showToast('复制失败，请手动复制');
+        }
+        document.body.removeChild(ta);
+    }
+
+    function getActiveFormat() {
+        const active = formatGroup.querySelector('.format-btn.active');
+        return active ? active.dataset.format : 'lowercase';
+    }
+
+    function formatUUID(uuid, format) {
+        if (format === 'uppercase') {
+            return uuid.toUpperCase();
+        }
+        if (format === 'no-hyphens') {
+            return uuid.replace(/-/g, '');
+        }
+        if (format === 'braces') {
+            return '{' + uuid + '}';
+        }
+        return uuid; // lowercase (default)
+    }
+
+    // ===== UUID GENERATORS =====
+
+    // v4: random (using built-in crypto.randomUUID)
+    function generateV4() {
+        return crypto.randomUUID();
+    }
+
+    // v1: time-based UUID (RFC 4122)
+    function generateV1() {
+        const uuidEpochOffset = 122192928000000000; // 100-ns intervals between 1582-10-15 and 1970-01-01
+        const now = Date.now();
+        const msecs = now * 10000 + uuidEpochOffset; // convert to 100-ns intervals
+
+        // Build the 60-bit timestamp parts
+        const timeLow = (msecs & 0xffffffff) >>> 0;
+        const timeMid = ((msecs >>> 32) & 0xffff) >>> 0;
+        const timeHiAndVersion = ((msecs >>> 48) & 0x0fff) | 0x1000; // version 1
+
+        // Random clock sequence (14 bits)
+        const clockSeqHi = ((Math.random() * 64) | 0) & 0x3f;
+        const clockSeqLow = (Math.random() * 256) | 0;
+
+        // Random node (6 bytes, instead of MAC)
+        const nodeBytes = new Uint8Array(6);
+        crypto.getRandomValues(nodeBytes);
+        // Set multicast bit (IEEE 802) to indicate random
+        nodeBytes[0] = (nodeBytes[0] & 0xfe) | 0x01;
+
+        function toHex(n, pad) {
+            return n.toString(16).padStart(pad, '0');
+        }
+
+        const parts = [
+            toHex(timeLow, 8),
+            toHex(timeMid, 4),
+            toHex(timeHiAndVersion, 4),
+            toHex(clockSeqHi, 2) + toHex(clockSeqLow, 2),
+            Array.from(nodeBytes).map(b => toHex(b, 2)).join('')
+        ];
+
+        return parts.join('-');
+    }
+
+    // v7: time-ordered UUID (RFC 9562)
+    // Layout: unix_ts_ms (48 bits) | ver (4 bits, 0x7) | rand_a (12 bits) | var (2 bits, 0b10) | rand_b (62 bits)
+    function generateV7() {
+        // RFC 9562: UUID v7
+        // unix_ts_ms (48 bits) | ver (4 bits, 0x7) | rand_a (12 bits) | var (2 bits, 0b10) | rand_b (62 bits)
+        const timestamp = BigInt(Date.now());
+        const randBytes = new Uint8Array(10);
+        crypto.getRandomValues(randBytes);
+
+        // Build the UUID as hex string
+        // Bytes 0-5: timestamp (48 bits)
+        const tsBytes = new Uint8Array(6);
+        let t = timestamp;
+        for (let i = 5; i >= 0; i--) {
+            tsBytes[i] = Number(t & 0xffn);
+            t >>= 8n;
+        }
+
+        // Byte 6: 4 bits version (0x7) + 4 bits high rand_a
+        const b6 = (0x70) | (randBytes[0] >> 4);
+
+        // Byte 7: 8 bits low rand_a
+        const b7 = ((randBytes[0] & 0x0f) << 4) | (randBytes[1] >> 4);
+
+        // Byte 8: 4 bits high rand_b + 2 bits variant (0b10) + 2 bits
+        // Actually: var is 2 bits at positions 7-6 of byte 8 (1-indexed)
+        // Byte 8 = variant (10) + rand_b high bits
+        const b8 = (0x80) | (randBytes[1] & 0x3f);
+
+        // Bytes 9-15: remaining rand_b (7 bytes)
+        const remaining = randBytes.slice(2, 9);
+
+        function toHex(n) {
+            return n.toString(16).padStart(2, '0');
+        }
+
+        const allBytes = [
+            ...Array.from(tsBytes),
+            b6,
+            b7,
+            b8,
+            ...Array.from(remaining)
+        ];
+
+        const hex = allBytes.map(b => toHex(b)).join('');
+
+        // Insert hyphens at standard positions
+        return hex.substring(0, 8) + '-' +
+               hex.substring(8, 12) + '-' +
+               hex.substring(12, 16) + '-' +
+               hex.substring(16, 20) + '-' +
+               hex.substring(20, 32);
+    }
+
+    function generateUUID(version) {
+        if (version === 'v4') return generateV4();
+        if (version === 'v1') return generateV1();
+        if (version === 'v7') return generateV7();
+        return generateV4();
+    }
+
+    // ===== RENDER =====
+
+    function renderResults(uuids, format, version) {
+        if (!uuids || uuids.length === 0) return;
+
+        currentUUIDs = uuids;
+
+        // Hide empty state, show results
+        emptyState.style.display = 'none';
+        resultsContent.style.display = 'block';
+
+        // Build list HTML
+        let html = '';
+        uuids.forEach((uuid, idx) => {
+            const formatted = formatUUID(uuid, format);
+            html += `
+                <div class="uuid-item" style="animation-delay:${idx * 0.04}s" data-uuid="${uuid.replace(/"/g, '&quot;')}">
+                    <span class="uuid-text" title="${formatted.replace(/"/g, '&quot;')}">${formatted}</span>
+                    <span class="uuid-version-badge">${version.toUpperCase()}</span>
+                    <button class="uuid-copy-btn" title="复制此 UUID">📋</button>
+                </div>
+            `;
+        });
+        uuidList.innerHTML = html;
+
+        // Bind per-item copy buttons
+        uuidList.querySelectorAll('.uuid-item').forEach((item, idx) => {
+            const btn = item.querySelector('.uuid-copy-btn');
+            const rawUuid = item.dataset.uuid;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const formatted = formatUUID(rawUuid, getActiveFormat());
+                copyToClipboard(formatted, this);
+            });
+        });
+
+        // Update stats
+        statCount.textContent = uuids.length;
+        const versionNames = { v4: 'v4 随机', v1: 'v1 时间', v7: 'v7 时间排序' };
+        statVersion.textContent = versionNames[version] || version.toUpperCase();
+        const formatNames = {
+            lowercase: '小写',
+            uppercase: '大写',
+            'no-hyphens': '无连字符',
+            braces: '带花括号'
+        };
+        statFormat.textContent = formatNames[format] || format;
+    }
+
+    function showEmptyState() {
+        emptyState.style.display = 'block';
+        resultsContent.style.display = 'none';
+        currentUUIDs = [];
+    }
+
+    // ===== GENERATE =====
+
+    function doGenerate() {
+        const version = versionSelect.value;
+        const qty = parseInt(qtySlider.value, 10);
+        const format = getActiveFormat();
+
+        // Animate button
+        generateBtn.classList.add('generating');
+
+        setTimeout(() => {
+            const uuids = [];
+            for (let i = 0; i < qty; i++) {
+                uuids.push(generateUUID(version));
+            }
+
+            renderResults(uuids, format, version);
+            generateBtn.classList.remove('generating');
+        }, 300);
+    }
+
+    // ===== BULK COPY =====
+
+    function copyBulk() {
+        if (currentUUIDs.length === 0) {
+            showToast('没有可复制的 UUID');
+            return;
+        }
+
+        const format = getActiveFormat();
+        const text = currentUUIDs.map(u => formatUUID(u, format)).join('\n');
+        copyToClipboard(text, bulkCopyBtn);
+    }
+
+    // ===== EVENT BINDING =====
+
+    // Quantity slider
+    qtySlider.addEventListener('input', function() {
+        qtyDisplay.textContent = this.value;
+    });
+
+    // Format buttons
+    formatGroup.querySelectorAll('.format-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            formatGroup.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFormat = this.dataset.format;
+
+            // Re-render existing results with new format
+            if (currentUUIDs.length > 0) {
+                const version = versionSelect.value;
+                renderResults(currentUUIDs, getActiveFormat(), version);
+            }
+        });
+    });
+
+    // Generate button
+    generateBtn.addEventListener('click', doGenerate);
+
+    // Bulk copy
+    bulkCopyBtn.addEventListener('click', copyBulk);
+
+    // Keyboard shortcut: Enter to generate
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.target.matches('input, textarea, select, button')) {
+            doGenerate();
+        }
+    });
+
+    // Regenerate when version or quantity changes (optional: only via button)
+    // No auto-regenerate — user must click generate
+
+    // ===== INIT =====
+    // Start with empty state (already visible)
+
+    // Generate initial UUIDs on load for demo
+    setTimeout(() => {
+        doGenerate();
+    }, 100);
+
+})();
+</script>
+
+</body>
+</html>
